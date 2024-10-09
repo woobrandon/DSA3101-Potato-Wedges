@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Description Optimiser</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+    <script>
+      const converter = new showdown.Converter();
+      async function optimizeMessage() {
+        const button = document.getElementById("query-button");
+        button.disabled = true;
+        document.getElementById("button-status").innerHTML =
+          '<div class="loading"></div>';
+        const response = await fetch("/optimise-description", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        document.getElementById("product-description").innerHTML =
+          converter.makeHtml(data.product_description);
+        document.getElementById("optimized-output").innerHTML =
+          converter.makeHtml(data.response);
+        button.disabled = false;
+        document.getElementById("button-status").innerHTML = "";
+      }
+    </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        min-width: 128px;
+        margin: 9px;
+      }
+      h1 {
+        color: #333;
+      }
+      pre {
+        background-color: #f4f4f4;
+        padding: 15px;
+        margin-top: -10px;
+        margin-bottom: -10px;
+        border-radius: 5px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      button {
+        height: 36px;
+        font-size: medium;
+        box-shadow: #333;
+      }
+      .button-div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        height: 36px;
+      }
+      .loading {
+        display: inline-block;
+        margin-left: 9px;
+        border: 3px solid rgba(0, 0, 0, 0.3);
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Product description optimiser</h1>
+    <div class="button-div">
+      <button onclick="optimizeMessage()" id="query-button">
+        Optimize random product description
+      </button>
+      <p id="button-status"></p>
+    </div>
+    <h2>Product Description:</h2>
+    <pre id="product-description"></pre>
+    <h2>Optimized Description:</h2>
+    <pre id="optimized-output"></pre>
+  </body>
+</html>
