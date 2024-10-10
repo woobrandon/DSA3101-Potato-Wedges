@@ -12,19 +12,68 @@
         button.disabled = true;
         document.getElementById("button-status").innerHTML =
           '<div class="loading"></div>';
-        const response = await fetch("/optimise-description", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        document.getElementById("product-description").innerHTML =
-          converter.makeHtml(data.product_description);
-        document.getElementById("optimized-output").innerHTML =
-          converter.makeHtml(data.response);
-        button.disabled = false;
-        document.getElementById("button-status").innerHTML = "";
+
+        try {
+          const responseDescription = await fetch("/get-description", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const data = await responseDescription.json();
+          document.getElementById("product-description").innerHTML =
+            converter.makeHtml(data.product_description);
+
+          const responseOptimise = await fetch(
+            "http://localhost:11434/api/generate",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                model: "llama3",
+                prompt: `Optimise these descriptions and format them with markdown. Do not includeany headers like "Here is the optimised product description in markdown format" or "Optimised Product Description"\n\n ${data.product_description}`,
+              }),
+            }
+          );
+          const reader = responseOptimise.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let done, value;
+          let output = "";
+          const updateInterval = 100;
+          let lastUpdateTime = Date.now();
+
+          while (({ done, value } = await reader.read())) {
+            if (done) break;
+
+            const text = decoder.decode(value, { stream: true });
+
+            text.split("\n").forEach((line) => {
+              try {
+                const data = JSON.parse(line);
+                output += data.response;
+
+                // Update the DOM periodically
+                if (Date.now() - lastUpdateTime > updateInterval) {
+                  document.getElementById("optimized-output").innerHTML =
+                    output;
+                  lastUpdateTime = Date.now();
+                }
+              } catch (error) {
+                console.error("Failed to parse JSON:", error);
+              }
+            });
+          }
+          document.getElementById("optimized-output").innerHTML =
+            converter.makeHtml(
+              document.getElementById("optimized-output").innerHTML
+            );
+        } catch (error) {
+          document.getElementById("optimized-output").innerHTML =
+            "An error occured: " + error;
+        } finally {
+          button.disabled = false;
+          document.getElementById("button-status").innerHTML = "";
+        }
       }
     </script>
     <style>

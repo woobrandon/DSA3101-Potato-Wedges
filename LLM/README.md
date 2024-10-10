@@ -2,27 +2,13 @@
 
 ## LLM (Optimising product descriptions)
 
-1. Download the libraries required:
+1. Install docker onto your local computer
 
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-   Ensure that docker is also installed.
-
-2. Pull and build the docker image, run the docker container and install llama3:
+2. Navigate to the LLM folder and run:
 
    ```sh
-   sh -c DockerOllama.sh
+   docker compose up
    ```
 
-   or
-
-   ```bash
-   bash DockerOllama.sh
-   ```
-
-3. Run the application and navigate to the exposed port:
-   ```python
-   python app.py
-   ```
+3. Open up the application on
+   `http://localhost:5001/`

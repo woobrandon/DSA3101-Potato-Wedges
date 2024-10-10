@@ -1,0 +1,28 @@
+services:
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    entrypoint:
+      [
+        "/bin/bash",
+        "-c",
+        "ollama start & sleep 5; ollama run llama3; tail -f /dev/null",
+      ]
+
+  web_app:
+    build: .
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./templates:/app/templates
+      - ./data:/app/data
+    depends_on:
+      - ollama
+    command: >
+      sh -c "python app.py"
+
+volumes:
+  ollama:
