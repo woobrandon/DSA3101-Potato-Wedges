@@ -1,0 +1,84 @@
+.appLogo {
+  height: 70px;
+  width: 70px;
+  pointer-events: none;
+  margin-left: 10px;
+}
+
+.logo {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.gitLogo {
+  margin:5px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: calc(10px + 2vmin);
+  background-color: rgba(138, 138, 138, 0.725);
+  width: 100%;
+}
+
+* {
+  color: black;
+}
+
+.uploadImageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.uploadTitle {
+  font-size: 20px;
+  margin-bottom: 10px;
+  font-weight:bold;
+}
+
+.inputImage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.fileInput {
+  display: flex;
+  align-items: center;
+}
+
+.uploadBox {
+  background-color: #f0f0f0; /* Grey background */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 10px; /* Rounded corners */
+  padding: 20px; /* Padding inside the box */
+  width: 100%;
+  max-width: 400px; /* Set a max width for the box */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow */
+  text-align: center; /* Center the text and input */
+}
+
+.fileInput {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%; /* Make input take full width of the box */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.previewImage{
+  height: 30%;
+  width: 30%;
+}
