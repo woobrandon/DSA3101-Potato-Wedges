@@ -15,7 +15,8 @@ By leveraging on llama3, we can post a product description to an endpoint and re
 
 3. Ensure that the docker contains are up and running via docker desktop
 
-4. Open up the application on your browser and enter the URL
+4. Open up the application on your browser by entering the URL
+
    `http://localhost:5001/`
 
 ## Impact on search rankings and conversion rates using SEO
@@ -24,8 +25,8 @@ By leveraging on llama3, we can post a product description to an endpoint and re
 
 1. Content creation and optimisation
 
-   - Analyse current trends and keywords by using tools like google analytics
-   - Generate content using LLM by providing these analysis as context for improved visibility to products
+   - Analyse current trends and keywords by using tools like Google Analytics
+   - Generate content using LLM by providing analysis as context for improved visibility to products
 
 2. Competitor Analysis
 
