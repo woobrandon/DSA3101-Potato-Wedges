@@ -6,6 +6,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-EXPOSE 5000
+EXPOSE 5001
 
-CMD ["python", "image_search.py"]
+CMD ["python", "app.py"]
