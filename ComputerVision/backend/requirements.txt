@@ -1,1 +1,6 @@
-numpy==2.1.2
+numpy
+flask
+flask-cors
+tensorflow
+scipy
+Pillow

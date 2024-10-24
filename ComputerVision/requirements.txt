@@ -1,0 +1,8 @@
+tensorflow
+scipy
+beautifulsoup4
+Pillow
+selenium
+pandas
+requests
+bottleneck
