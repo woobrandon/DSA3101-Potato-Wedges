@@ -48,13 +48,31 @@ def create_table():
         id INTEGER PRIMARY KEY,
         filename TEXT,
         features BLOB,
-        productUrl TEXT
+        productUrl TEXT,
+        about TEXT
     )
     ''')
     conn.commit()
     conn.close()
     print("Table initialized!")
 
+def insert_features(id, filename, features, productUrl, about):
+    """
+    Inserts features into database after extracting it with the extract function
+    """
+    conn = sqlite3.connect('feature_database.db')
+    cursor = conn.cursor()
+
+    # Convert features to binary format
+    features_blob = features.tobytes()
+
+    cursor.execute('''
+    INSERT INTO features (id, filename, features, productUrl, about) VALUES (?, ?, ?, ?, ?)
+    ''', (id, filename, features_blob, productUrl, about))
+
+    conn.commit()
+    conn.close()
+    return
 
 def scrape_amzn_images():
     """
@@ -68,7 +86,7 @@ def scrape_amzn_images():
     service = Service('./chromedriver')
     driver = webdriver.Chrome(service=service)
 
-    for i in range(1, n+1):
+    for i in range(i, n+1):
         response = requests.get(images.iloc[i-1]["img_link"])
         if response.status_code == 200:
             with open("../amazon_images/image_" + str(i) + ".jpg", "wb") as file:
@@ -94,29 +112,11 @@ def scrape_amzn_images():
     return
 
 
-def insert_features(id, filename, features, productUrl):
-    """
-    Inserts features into database after extracting it with the extract function
-    """
-    conn = sqlite3.connect('feature_database.db')
-    cursor = conn.cursor()
-
-    # Convert features to binary format
-    features_blob = features.tobytes()
-
-    cursor.execute('''
-    INSERT INTO features (id, filename, features, productUrl) VALUES (?, ?, ?, ?)
-    ''', (id, filename, features_blob, productUrl))
-
-    conn.commit()
-    conn.close()
-    return
-
-
 create_table()
 
 folder_path = '../amazon_images'
 
+# Scrapes the amazon website
 # if not os.path.exists(folder_path):
 #     os.makedirs(folder_path)
 #     scrape_amzn_images()
@@ -129,7 +129,7 @@ for img in os.listdir(folder_path):
     try:
         img_path = os.path.join(folder_path, img)
         img_features = extract_features(img_path)
-        insert_features(db_id, img, img_features, amazon_df["product_link"][int(img[6:-4])-1])
+        insert_features(db_id, img, img_features, amazon_df["product_link"][int(img[6:-4])-1], amazon_df["about_product"][int(img[6:-4])-1])
         db_id += 1
     except:
         print(str(img) + " was unable to be inserted")

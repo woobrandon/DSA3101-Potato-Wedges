@@ -8,16 +8,13 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 from scipy.spatial.distance import cosine
 from PIL import Image
 from io import BytesIO
-import logging
-logging.basicConfig(level=logging.INFO)
 import base64
 
 app = Flask(__name__)
 CORS(app)
 
-app.logger.setLevel(logging.INFO)
-
-model = ResNet50(weights='resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
+# If there is an error of being unable to find the weights file, try changing the directory in the terminal to /backend.
+model = ResNet50(weights='./resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
                  include_top=False, pooling='avg')
 
 
@@ -70,7 +67,7 @@ def get_image(id: int):
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT filename, productUrl FROM features WHERE id=?', (id,))
+    cursor.execute('SELECT filename, productUrl, about FROM features WHERE id=?', (id,))
     filename = cursor.fetchall()[0]
 
     conn.close()
@@ -86,8 +83,10 @@ def get_image(id: int):
         response = {
             'image': img_base64,
             "product_url": filename[1],
+            "about": filename[2],
         }
-        return jsonify(response), 
+        print(response)
+        return jsonify(response), 200
     else:
         return jsonify({'error': 'Image not found'}), 404
 

@@ -8,7 +8,8 @@ import axios from "axios";
 const App: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [productUrl, setProductUrl] = useState<string | null> (null);
+  const [productUrl, setProductUrl] = useState<string> ("");
+  const [productAbout, setProductAbout] = useState<string>("");
 
   const backgroundStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -44,9 +45,10 @@ const App: React.FC = () => {
       );
 
       const processedImage  = response.data.image;
-      console.log(processedImage);
       setProcessedImage(processedImage);
-      console.log(response);
+      setProductUrl(response.data.product_url);
+      setProductAbout(response.data.about);
+      console.log(response.data.about)
     } catch (error) {
       console.error("Error processing image:", error);
     }
@@ -58,7 +60,7 @@ const App: React.FC = () => {
         <p className = {styles.webTitle}>Amazon Product Finder</p>
       </header>
       <div className={styles.uploadImageContainer}>
-        <h2 className="uploadTitle">Upload Your Image</h2>
+        <h3 className="uploadTitle">Upload Your Image</h3>
         <div className={styles.uploadBox}>
           <input
             type="file"
@@ -75,21 +77,26 @@ const App: React.FC = () => {
           ) : (
             <p>No file selected</p>
           )}
+          <div className = {styles.processImageButtonContainer}>
+            <button className={styles.processImageButton} onClick ={() => {selectedPhoto && handleProcessImage(selectedPhoto)}}>
+              Find Product
+            </button>
+          </div>
         </div>
-      </div>
-      <div className = {styles.processImageButtonContainer}>
-        <button className={styles.processImageButton} onClick ={() => {selectedPhoto && handleProcessImage(selectedPhoto)}}>
-          Find Product
-        </button>
       </div>
       {processedImage && ( // Display the processed image
         <div className={styles.processedImageContainer}>
-          <img
-            src={`data:image/png;base64,${processedImage}`}
-            alt="Processed"
-            className={styles.processedImage}
-          />
-          <a>Click here to go to website</a>
+          <div className={styles.processedImageWrapper}>
+            <img
+              src={`data:image/png;base64,${processedImage}`}
+              alt="Processed"
+              className={styles.processedImage}
+            />
+            <div className = {styles.description}>
+              <a href = {productUrl}>Product URL</a>
+              <p>{productAbout}</p>
+            </div>
+          </div>
         </div>
       )}
     </div>
