@@ -7,6 +7,7 @@ import axios from "axios";
 
 const App: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
 
   const backgroundStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -41,11 +42,9 @@ const App: React.FC = () => {
         }
       );
 
-      const { image: processedImage } = response.data.image;
-
-      const imgElement = document.createElement("img");
-      imgElement.src = `data:image/png;base64,${processedImage}`;
-      document.body.appendChild(imgElement); // Append image to the document
+      const processedImage  = response.data.image;
+      console.log(processedImage);
+      setProcessedImage(processedImage);
     } catch (error) {
       console.error("Error processing image:", error);
     }
@@ -57,6 +56,7 @@ const App: React.FC = () => {
         <div className={styles.logo}>
           <img src={potato} className={styles.appLogo} alt="logo" />
         </div>
+        <p>Amazon Product Finder</p>
         <div className={styles.gitLogo}>
           <GitHubLink repoUrl="https://github.com/woobrandon/E-commerce-Performance-Analysis-and-Optimization" />
         </div>
@@ -91,6 +91,15 @@ const App: React.FC = () => {
           <p>Process image</p>
         </span>
       </div>
+      {processedImage && ( // Display the processed image
+        <div className={styles.processedImageContainer}>
+          <img
+            src={`data:image/png;base64,${processedImage}`}
+            alt="Processed"
+            className={styles.processedImage}
+          />
+        </div>
+      )}
     </div>
   );
 };
