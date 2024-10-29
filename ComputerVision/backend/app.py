@@ -70,11 +70,10 @@ def get_image(id: int):
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT filename FROM features WHERE id=?', (id,))
-    filename = cursor.fetchone()
+    cursor.execute('SELECT filename, productUrl FROM features WHERE id=?', (id,))
+    filename = cursor.fetchall()[0]
 
     conn.close()
-    print(filename)
     if filename:
         image_path = f'../amazon_images/{filename[0]}'  # Update with actual path
         img = Image.open(image_path)
@@ -86,8 +85,9 @@ def get_image(id: int):
 
         response = {
             'image': img_base64,
+            "product_url": filename[1],
         }
-        return jsonify(response)
+        return jsonify(response), 
     else:
         return jsonify({'error': 'Image not found'}), 404
 
@@ -97,12 +97,9 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    print("Image Features: ", img_features)
     img_similar = find_similar_features(img_features)
-    print("Similar Image Data: ", img_similar)
     if img_similar:
         response = get_image(img_similar)
-        print("Response from get_image:", response.get_json()) 
         return response
     else:
         return jsonify({"error": "No similar images found"}), 404

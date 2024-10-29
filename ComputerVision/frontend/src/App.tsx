@@ -8,6 +8,7 @@ import axios from "axios";
 const App: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [productUrl, setProductUrl] = useState<string | null> (null);
 
   const backgroundStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -45,6 +46,7 @@ const App: React.FC = () => {
       const processedImage  = response.data.image;
       console.log(processedImage);
       setProcessedImage(processedImage);
+      console.log(response);
     } catch (error) {
       console.error("Error processing image:", error);
     }
@@ -53,13 +55,7 @@ const App: React.FC = () => {
   return (
     <div className={styles.background} style={backgroundStyle}>
       <header className={styles.header}>
-        <div className={styles.logo}>
-          <img src={potato} className={styles.appLogo} alt="logo" />
-        </div>
-        <p>Amazon Product Finder</p>
-        <div className={styles.gitLogo}>
-          <GitHubLink repoUrl="https://github.com/woobrandon/E-commerce-Performance-Analysis-and-Optimization" />
-        </div>
+        <p className = {styles.webTitle}>Amazon Product Finder</p>
       </header>
       <div className={styles.uploadImageContainer}>
         <h2 className="uploadTitle">Upload Your Image</h2>
@@ -81,15 +77,10 @@ const App: React.FC = () => {
           )}
         </div>
       </div>
-      <div>
-        <span
-          className={styles.processImageButton}
-          onClick={() => {
-            selectedPhoto && handleProcessImage(selectedPhoto);
-          }}
-        >
-          <p>Process image</p>
-        </span>
+      <div className = {styles.processImageButtonContainer}>
+        <button className={styles.processImageButton} onClick ={() => {selectedPhoto && handleProcessImage(selectedPhoto)}}>
+          Find Product
+        </button>
       </div>
       {processedImage && ( // Display the processed image
         <div className={styles.processedImageContainer}>
@@ -98,6 +89,7 @@ const App: React.FC = () => {
             alt="Processed"
             className={styles.processedImage}
           />
+          <a>Click here to go to website</a>
         </div>
       )}
     </div>
