@@ -3,8 +3,18 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
-    font-size: calc(10px + 2vmin);
-    background-color: rgba(138, 138, 138, 0.725);
+    font-family:Verdana, Geneva, sans-serif;
+    font-size: 17px;
+    background-color: rgba(94, 93, 93, 0.725);
     width: 100%;
     margin-bottom: 5px;
   }
+
+.headerButton {
+    padding: 8px;
+    color: white;
+}
+
+.headerButton:hover {
+    cursor: pointer;
+}

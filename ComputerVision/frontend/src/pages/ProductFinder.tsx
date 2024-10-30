@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./ProductFinder.module.css";
 import axios from "axios";
+import Header from '../components/Header';
 
 interface Data {
   image: string;
@@ -51,9 +52,7 @@ const ProductFinder: React.FC = () => {
 
   return (
     <div className = {styles.background}>
-      <header className={styles.header}>
-        <p className = {styles.webTitle}>Amazon Product Finder</p>
-      </header>
+      <Header />
       <div className={styles.uploadImageContainer}>
         <div className={styles.uploadBox}>
           <h4 className="uploadTitle">Upload Your Image</h4>

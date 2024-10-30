@@ -1,11 +1,25 @@
 import React, { useState } from "react";
-import styles from "./Header.module.css"
+import styles from "./Header.module.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Header = () => {
+    const navigate = useNavigate();
+    const headerItems = [
+        { label: "Home", path: "/"},
+        { label: "ProductFinder", path: "/ProductFinder"},
+    ];
+
+    const navigateTo = (path: string) => {
+        navigate(path);
+      };
     return (
         <div>
             <header className={styles.header}>
-                <p className = {styles.webTitle}>Amazon Product Finder</p>
+                {headerItems.map((headerItem) => (
+                    <div onClick={() => navigateTo(headerItem.path)} className = {styles.headerButton}>
+                        {headerItem.label}
+                    </div>
+                ))}
             </header>
         </div>
     )
