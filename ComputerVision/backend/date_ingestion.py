@@ -46,6 +46,7 @@ def create_table():
     cursor.execute('''
     CREATE TABLE features (
         id INTEGER PRIMARY KEY,
+        productname TEXT,
         filename TEXT,
         features BLOB,
         productUrl TEXT,
@@ -56,10 +57,11 @@ def create_table():
     conn.close()
     print("Table initialized!")
 
-def insert_features(id, filename, features, productUrl, about):
+def insert_features(id, productname, filename, features, productUrl, about):
     """
     Inserts features into database after extracting it with the extract function
     """
+    about = about.replace("|", ", ")
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
@@ -67,8 +69,8 @@ def insert_features(id, filename, features, productUrl, about):
     features_blob = features.tobytes()
 
     cursor.execute('''
-    INSERT INTO features (id, filename, features, productUrl, about) VALUES (?, ?, ?, ?, ?)
-    ''', (id, filename, features_blob, productUrl, about))
+    INSERT INTO features (id, productname, filename, features, productUrl, about) VALUES (?, ?, ?, ?, ?, ?)
+    ''', (id, productname, filename, features_blob, productUrl, about))
 
     conn.commit()
     conn.close()
@@ -129,7 +131,7 @@ for img in os.listdir(folder_path):
     try:
         img_path = os.path.join(folder_path, img)
         img_features = extract_features(img_path)
-        insert_features(db_id, img, img_features, amazon_df["product_link"][int(img[6:-4])-1], amazon_df["about_product"][int(img[6:-4])-1])
+        insert_features(db_id,  amazon_df["product_name"][int(img[6:-4])-1], img, img_features, amazon_df["product_link"][int(img[6:-4])-1], amazon_df["about_product"][int(img[6:-4])-1], )
         db_id += 1
     except:
         print(str(img) + " was unable to be inserted")

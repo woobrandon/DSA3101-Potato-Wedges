@@ -43,52 +43,62 @@ def find_similar_features(query_features) -> int:
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT id, features FROM features')
+    cursor.execute('SELECT id, features, productname FROM features')
     rows = cursor.fetchall()
 
     similar_items = []
     for row in rows:
-        id, features_blob = row
+        id, features_blob, name = row
         features = np.frombuffer(features_blob, dtype=np.float32)
         distance = cosine(query_features[0], features)
-        similar_items.append([id, distance])
+        similar_items.append([id, distance, name])
     similar_items.sort(key=lambda x: x[1])
     conn.close()
+    products = []
+    result = []
     if similar_items:
-        return similar_items[0][0]
+        while len(products) < 5:
+            curr_img = similar_items.pop(0)
+            if curr_img[2] not in products:
+                result.append(curr_img[0])
+                products.append(curr_img[2])
+        return result
     else:
         return None
 
 
-def get_image(id: int):
+def get_image(ids: int):
     """
     Get the base64 image based on the id
     """
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT filename, productUrl, about FROM features WHERE id=?', (id,))
-    filename = cursor.fetchall()[0]
+    image_data = []
 
+    for id in ids:
+        cursor.execute('SELECT productname, filename, productUrl, about FROM features WHERE id=?', (id,))
+        data = cursor.fetchall()[0]
+        if data:
+            productname, filename, productUrl, about = data
+            image_path = f'../amazon_images/{filename}'  # Update with actual path
+            img = Image.open(image_path)
+
+            # Convert image to base64
+            buffered = BytesIO()
+            img.save(buffered, format="JPEG")
+            img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            image_data.append({
+                'name': productname,
+                'image': img_base64,
+                'product_url': productUrl,
+                'about': about,
+            })
+        else:
+            return jsonify({'error': 'Image not found'}), 404
     conn.close()
-    if filename:
-        image_path = f'../amazon_images/{filename[0]}'  # Update with actual path
-        img = Image.open(image_path)
+    return image_data
 
-        # Convert image to base64
-        buffered = BytesIO()
-        img.save(buffered, format="JPEG")
-        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-
-        response = {
-            'image': img_base64,
-            "product_url": filename[1],
-            "about": filename[2],
-        }
-        print(response)
-        return jsonify(response), 200
-    else:
-        return jsonify({'error': 'Image not found'}), 404
 
 @app.route('/process-image/image-search', methods=['POST'])
 def processImage():
@@ -96,9 +106,10 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    img_similar = find_similar_features(img_features)
-    if img_similar:
-        response = get_image(img_similar)
+    similar_imgs = find_similar_features(img_features)
+    
+    if similar_imgs:
+        response = get_image(similar_imgs)
         return response
     else:
         return jsonify({"error": "No similar images found"}), 404
