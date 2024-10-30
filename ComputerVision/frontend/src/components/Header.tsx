@@ -7,6 +7,7 @@ const Header = () => {
     const headerItems = [
         { label: "Home", path: "/"},
         { label: "ProductFinder", path: "/ProductFinder"},
+        { label: "ProductCategorization", path: "/ProductCategorization"},
     ];
 
     const navigateTo = (path: string) => {

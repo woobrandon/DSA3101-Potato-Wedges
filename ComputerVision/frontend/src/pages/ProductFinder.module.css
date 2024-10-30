@@ -7,27 +7,7 @@
     height: 100vh;
     width: 100%;
   }
-  
-.header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-  font-size: calc(10px + 2vmin);
-  background-color: rgba(138, 138, 138, 0.725);
-  width: 100%;
-  margin-bottom: 5px;
-}
-  
-.webTitle {
-  margin: 0px;
-  padding: 5px;
-  font-size: 15px;
-}
 
-* {
-  color: black;
-}
 
 .uploadImageContainer {
   display: flex;

@@ -36,7 +36,7 @@ def extract_features(image_data: str):
     return features
 
 
-def find_similar_features(query_features) -> int:
+def find_similar_features(query_features, n: int) -> int:
     """
     Find the most similar image based on features extracted from ResNet50 model and returns the ID of the most similar image
     """
@@ -57,7 +57,7 @@ def find_similar_features(query_features) -> int:
     products = []
     result = []
     if similar_items:
-        while len(products) < 5:
+        while len(products) < n+1:
             curr_img = similar_items.pop(0)
             if curr_img[2] not in products:
                 result.append(curr_img[0])
@@ -77,10 +77,10 @@ def get_image(ids: int):
     image_data = []
 
     for id in ids:
-        cursor.execute('SELECT productname, filename, productUrl, about FROM features WHERE id=?', (id,))
+        cursor.execute('SELECT productname, filename, productUrl, about, category FROM features WHERE id=?', (id,))
         data = cursor.fetchall()[0]
         if data:
-            productname, filename, productUrl, about = data
+            productname, filename, productUrl, about, category = data
             image_path = f'../amazon_images/{filename}'  # Update with actual path
             img = Image.open(image_path)
 
@@ -93,6 +93,7 @@ def get_image(ids: int):
                 'image': img_base64,
                 'product_url': productUrl,
                 'about': about,
+                'category': category,
             })
         else:
             return jsonify({'error': 'Image not found'}), 404
@@ -106,13 +107,38 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs = find_similar_features(img_features)
+    similar_imgs = find_similar_features(img_features, 4)
     
     if similar_imgs:
         response = get_image(similar_imgs)
         return response
     else:
         return jsonify({"error": "No similar images found"}), 404
+
+@app.route('/process-image/image-categorization', methods=['POST'])
+def categorization():
+    image_data = request.get_json().get('image')
+    if not image_data:
+        return jsonify({"error: ", "No image found"}), 400
+    img_features = extract_features(image_data)
+    similar_imgs_id = find_similar_features(img_features, 100)
+    if similar_imgs_id:
+        categories = {}
+        result = []
+        i = 0
+        similar_imgs = get_image(similar_imgs_id)
+        for img in similar_imgs:
+            try:
+                position = categories[img["category"]]
+                result[position][1] += 1
+            except:
+                categories[img["category"]] = i
+                result.append([img["category"],1])
+                i += 1
+        result.sort(key = lambda x: x[1], reverse = True)
+        return result[0][0]
+        
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
