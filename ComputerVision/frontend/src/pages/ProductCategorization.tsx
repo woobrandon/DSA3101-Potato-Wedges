@@ -1,47 +1,46 @@
 import React, { useState } from "react";
-import Header from '../components/Header';
+import Header from "../components/Header";
 import styles from "./ProductCategorization.module.css";
 import axios from "axios";
 
-const ProductCategorization:  React.FC = () => {
-    const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-    const [category, setCategory] = useState<string>("");
+const ProductCategorization: React.FC = () => {
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [category, setCategory] = useState<string>("");
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-    
-        if (file) {
-          const reader = new FileReader();
-    
-          reader.onloadend = () => {
-            // Image stored as a base64 string
-            setSelectedPhoto(reader.result as string);
-          };
-    
-          reader.readAsDataURL(file); // Read the file as a data URL
-        }
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        // Image stored as a base64 string
+        setSelectedPhoto(reader.result as string);
       };
 
-      const handleProcessImage = async (image: string) => {
-        try {
-          const response = await axios.post(
-            "http://localhost:5001/process-image/image-categorization",
-            {
-              image: image, // Send the Base64 string
-            }
-          );
-          setCategory(response.data)
-          console.log(response);
+      reader.readAsDataURL(file); // Read the file as a data URL
+    }
+  };
 
-        } catch (error) {
-          console.error("Error processing image:", error);
+  const handleProcessImage = async (image: string) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5001/process-image/image-categorization",
+        {
+          image: image, // Send the Base64 string
         }
-      };
-    
-    return (
-        <div className = {styles.background}>
-            <Header />
-            <div className={styles.uploadImageContainer}>
+      );
+      setCategory(response.data);
+      console.log(response);
+    } catch (error) {
+      console.error("Error processing image:", error);
+    }
+  };
+
+  return (
+    <div className={styles.background}>
+      <Header />
+      <div className={styles.uploadImageContainer}>
         <div className={styles.uploadBox}>
           <h4 className="uploadTitle">Upload Your Image</h4>
           <input
@@ -54,23 +53,28 @@ const ProductCategorization:  React.FC = () => {
             <img
               src={selectedPhoto as string}
               alt="Selected"
-              className = {styles.previewImage}
+              className={styles.previewImage}
             />
           ) : (
             <p>No file selected</p>
           )}
-          <div className = {styles.processImageButtonContainer}>
-            <button className={styles.processImageButton} onClick ={() => {selectedPhoto && handleProcessImage(selectedPhoto)}}>
+          <div className={styles.processImageButtonContainer}>
+            <button
+              className={styles.processImageButton}
+              onClick={() => {
+                selectedPhoto && handleProcessImage(selectedPhoto);
+              }}
+            >
               Find Category
             </button>
           </div>
-          {category && ( // Display the processed image
-            <p>{category}</p>
+        </div>
+        {category && ( // Display the processed category
+          <span className={styles.processedCategory}>{category}</span>
         )}
-        </div>
       </div>
-        </div>
-    )
-}
+    </div>
+  );
+};
 
-export default ProductCategorization
+export default ProductCategorization;
