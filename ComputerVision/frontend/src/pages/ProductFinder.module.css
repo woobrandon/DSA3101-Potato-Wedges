@@ -1,19 +1,33 @@
 .background {
-    background-image: url('../assets/amazon_background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    height: 100vh;
-    width: 100%;
-  }
-
+  background-image: url("../assets/amazon_background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  height: 100vh;
+  width: 100%;
+}
 
 .uploadImageContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.uploadBox {
+  background-color: rgb(250, 250, 250);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers content horizontally */
+  justify-content: center; /* Centers content vertically */
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 5px;
+  text-align: center;
+  margin: 12px;
+  max-height: 65%;
+  max-width: 75%;
 }
 
 .uploadTitle {
@@ -33,42 +47,26 @@
 .fileInput {
   display: flex;
   align-items: center;
-  margin: 5px;
-  padding: 5px;
-}
-
-.uploadBox {
-  background-color: rgb(250, 250, 250);
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Centers content horizontally */
-  justify-content: center; /* Centers content vertically */
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  padding: 5px;
-  text-align: center;
-  margin: 5px;
-}
-
-.fileInput {
-  display: flex;
-  align-items: center;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 100%; /* Make input take full width of the box */
   cursor: pointer; /* Pointer cursor on hover */
+  margin: 5px;
+  padding: 5px;
 }
 
 .previewImage {
-  height: 30%;
-  width: 30%;
+  height: auto;
+  width: auto;
+  max-height: 186px;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .processImageButtonContainer {
   display: flex;
   justify-content: space-around;
-  padding-top:10px;
+  padding-top: 10px;
 }
 
 .processImageButton {
@@ -94,32 +92,68 @@
 
 .processedImageContainer {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.processedImage {
+  height: auto;
+  width: auto;
+  max-height: 126px;
+  max-width: 100%;
+  object-fit: contain;
+  padding-right: 6px;
+  margin-right: 12px;
+  background-color: #29a7bb;
 }
 
 .processedImageWrapper {
   display: flex;
+  flex: row;
   justify-content: center;
-  width: 50%;
   background-color: rgb(250, 250, 250);
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 10px;
-  margin: 10px;
   border-radius: 10px;
+  width: 100%;
+  max-width: 726px;
 }
 
 .description {
+  display: flex;
+  flex-direction: column;
   padding: 5px;
+  font-size: small;
+}
+
+.possibleProcessedImageContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgb(250, 250, 250);
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  width: 100%;
 }
 
 .possibleProcessedImageWrapper {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 50%;
-  background-color: rgb(250, 250, 250);
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 95%;
+}
+
+.processedImagePossible {
+  height: auto;
+  width: auto;
+  max-height: 126px;
+  max-width: 100%;
+  object-fit: contain;
+  padding-left: 9px;
+  padding-right: 9px;
+  padding-bottom: 9px;
 }

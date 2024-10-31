@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./ProductFinder.module.css";
 import axios from "axios";
-import Header from '../components/Header';
+import Header from "../components/Header";
 
 interface Data {
   image: string;
@@ -13,7 +13,7 @@ interface Data {
 const ProductFinder: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [processedImages, setProcessedImages] = useState<string[] | null>(null);
-  const [productUrl, setProductUrl] = useState<string> ("");
+  const [productUrl, setProductUrl] = useState<string>("");
   const [productAbout, setProductAbout] = useState<string>("");
   const [name, setName] = useState<string>("");
 
@@ -51,7 +51,7 @@ const ProductFinder: React.FC = () => {
   };
 
   return (
-    <div className = {styles.background}>
+    <div className={styles.background}>
       <Header />
       <div className={styles.uploadImageContainer}>
         <div className={styles.uploadBox}>
@@ -66,42 +66,57 @@ const ProductFinder: React.FC = () => {
             <img
               src={selectedPhoto as string}
               alt="Selected"
-              className = {styles.previewImage}
+              className={styles.previewImage}
             />
           ) : (
             <p>No file selected</p>
           )}
-          <div className = {styles.processImageButtonContainer}>
-            <button className={styles.processImageButton} onClick ={() => {selectedPhoto && handleProcessImage(selectedPhoto)}}>
+          <div className={styles.processImageButtonContainer}>
+            <button
+              className={styles.processImageButton}
+              onClick={() => {
+                selectedPhoto && handleProcessImage(selectedPhoto);
+              }}
+            >
               Find Product
             </button>
           </div>
         </div>
       </div>
+
       {processedImages && ( // Display the processed image
-        <div className = {styles.processedImageContainer}>
-          <div className = {styles.processedImageWrapper}>
+        <div className={styles.processedImageContainer}>
+          <div className={styles.processedImageWrapper}>
             <img
               src={`data:image/png;base64,${processedImages[0]}`}
               alt="Processed"
-              className = {styles.processedImage}
+              className={styles.processedImage}
             />
-            <div className = {styles.description}>
-              <a href = {productUrl}>Product Link</a>
-              <p>Product Name: {name}</p>
-              <p>About: {productAbout}</p>
+            <div className={styles.description}>
+              <a href={productUrl}>Product Link</a>
+              <p>
+                <strong>Product Name:</strong> {name}
+              </p>
+              <p>
+                <strong>About:</strong> {productAbout}
+              </p>
             </div>
           </div>
-            <div className = {styles.possibleProcessedImageWrapper}>
-              Possible Other Products
+          <div className={styles.possibleProcessedImageContainer}>
+            <p>Others also view</p>
+            <div className={styles.possibleProcessedImageWrapper}>
               <div>
-                <img
-                  src={`data:image/png;base64,${processedImages[2]}`}
-                  alt="Processed"
-                  className = {styles.processedImage}
-                />
+                {processedImages.slice(1, 6).map((img, id) => (
+                  <img
+                    key={id}
+                    src={`data:image/png;base64,${img}`}
+                    alt="Processed"
+                    className={styles.processedImagePossible}
+                  />
+                ))}
               </div>
             </div>
+          </div>
         </div>
       )}
     </div>
