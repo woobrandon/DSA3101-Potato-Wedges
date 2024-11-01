@@ -1,6 +1,13 @@
-numpy
-flask
+Flask
 flask-cors
 tensorflow
+numpy
+pandas
 scipy
 Pillow
+scikit-learn
+beautifulsoup4
+selenium
+requests
+gensim
+nltk

@@ -1,4 +1,13 @@
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./amazon_images:/amazon_images
+
   frontend:
     build:
       context: ./frontend
@@ -7,10 +16,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: ./Dockerfile
-    ports:
-      - "5001:5000"
+    volumes:
+      - ./amazon_images:/amazon_images
