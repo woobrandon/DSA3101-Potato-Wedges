@@ -4,8 +4,9 @@
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  height: 100vh;
-  width: 100%;
+  min-height: 100vh;
+  min-width: 100vw;
+  z-index: -50;
 }
 
 .uploadImageContainer {
@@ -138,6 +139,7 @@
   margin: 10px;
   border-radius: 10px;
   width: 100%;
+  max-width: 726px;
 }
 
 .possibleProcessedImageWrapper {

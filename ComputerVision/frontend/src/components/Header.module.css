@@ -1,20 +1,21 @@
 .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    font-family:Verdana, Geneva, sans-serif;
-    font-size: 17px;
-    background-color: rgba(94, 93, 93, 0.725);
-    width: 100%;
-    margin-bottom: 5px;
-  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 17px;
+  background-color: rgba(94, 93, 93, 0.725);
+  width: 100%;
+  margin-bottom: 5px;
+  z-index: 50;
+}
 
 .headerButton {
-    padding: 8px;
-    color: white;
+  padding: 8px;
+  color: white;
 }
 
 .headerButton:hover {
-    cursor: pointer;
+  cursor: pointer;
 }

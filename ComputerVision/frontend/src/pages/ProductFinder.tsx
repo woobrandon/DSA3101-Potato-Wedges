@@ -13,6 +13,7 @@ interface Data {
 const ProductFinder: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [processedImages, setProcessedImages] = useState<string[] | null>(null);
+  const [processedProducts, setProcessedProducts] = useState<string[]>([]);
   const [productUrl, setProductUrl] = useState<string>("");
   const [productAbout, setProductAbout] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -41,10 +42,15 @@ const ProductFinder: React.FC = () => {
         }
       );
       console.log(response);
-      setProcessedImages(response.data.map((data: Data) => data.image));
-      setProductUrl(response.data[0].product_url);
-      setProductAbout(response.data[0].about);
-      setName(response.data[0].name);
+      setProcessedImages(
+        response.data.image_search.map((data: Data) => data.image)
+      );
+      setProcessedProducts(
+        response.data.cross_sell.map((data: Data) => data.name)
+      );
+      setProductUrl(response.data.image_search[0].product_url);
+      setProductAbout(response.data.image_search[0].about);
+      setName(response.data.image_search[0].name);
     } catch (error) {
       console.error("Error processing image:", error);
     }
@@ -103,16 +109,26 @@ const ProductFinder: React.FC = () => {
             </div>
           </div>
           <div className={styles.possibleProcessedImageContainer}>
-            <p>Others also view</p>
+            <p>Other similar products (by image)</p>
             <div className={styles.possibleProcessedImageWrapper}>
               <div>
-                {processedImages.slice(1, 6).map((img, id) => (
+                {processedImages.slice(1, 5).map((img, id) => (
                   <img
                     key={id}
                     src={`data:image/png;base64,${img}`}
                     alt="Processed"
                     className={styles.processedImagePossible}
                   />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className={styles.possibleProcessedImageContainer}>
+            <p>Other similar products (by description)</p>
+            <div className={styles.possibleProcessedImageWrapper}>
+              <div>
+                {processedProducts.slice(1, 5).map((name, id) => (
+                  <p key={id}>{name}</p>
                 ))}
               </div>
             </div>
