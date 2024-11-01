@@ -117,6 +117,18 @@ def cross_sell(product_id):
         # Decode the pickle encoded column, 'vector'
         return pickle.loads(pickle_bytes)
 
+    def convertToBase64Image(filename: str) -> str:
+        image_path = f'../amazon_images/{filename}'
+        img = Image.open(image_path)
+
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        return img_base64
+
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
@@ -145,6 +157,8 @@ def cross_sell(product_id):
     # print(mat)
     conn.close()
 
+    data_df['image'] = data_df['filename'].apply(convertToBase64Image)
+
     cos_sim = cosine_similarity(base_vec, mat).flatten()
     # print(cos_sim)
     df = data_df.copy()
@@ -157,7 +171,8 @@ def cross_sell(product_id):
             'product_url': similarity.iloc[i]['productUrl'],
             'about': similarity.iloc[i]['about_product'],
             'category': similarity.iloc[i]['category'],
-            'product_desc': similarity.iloc[i]['product_desc']
+            'product_desc': similarity.iloc[i]['product_desc'],
+            'image': similarity.iloc[i]['image']
         })
     return similarity_data
 
