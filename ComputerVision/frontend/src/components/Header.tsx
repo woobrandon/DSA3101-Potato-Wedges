@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Header.module.css";
 import { Navigate, useNavigate } from "react-router-dom";
-import logo from "../assets/potato.png"
+import logo from "../assets/logo.png"
 
 const Header = () => {
     const navigate = useNavigate();
@@ -17,13 +17,7 @@ const Header = () => {
     return (
         <div>
             <header className={styles.header}>
-                <div className = {styles.logo}>
-                    <img src = {logo} height = "50px" width = "40px"/>
-                    <p className = {styles.webTitle}>
-                        Potato<br />
-                        Wedges<br />
-                    </p>
-                </div>
+                <img src = {logo} className = {styles.logo}/>
                 <div className = {styles.appButton}>
                     {headerItems.map((headerItem) => (
                         <div onClick={() => navigateTo(headerItem.path)} className = {styles.headerButton}>
