@@ -1,5 +1,6 @@
 import sqlite3
 import numpy as np
+import pandas as pd
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from tensorflow.keras.applications import ResNet50
@@ -8,7 +9,9 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 from scipy.spatial.distance import cosine
 from PIL import Image
 from io import BytesIO
+import pickle
 import base64
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 CORS(app)
@@ -38,20 +41,20 @@ def extract_features(image_data: str):
 
 def find_similar_features(query_features, n: int) -> int:
     """
-    Find the most similar image based on features extracted from ResNet50 model and returns the ID of the most similar image
+    Find the most similar image based on features extracted from ResNet50 model and returns the product_id of the most similar image
     """
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT id, features, productname FROM features')
+    cursor.execute('SELECT product_id, features, product_name FROM features')
     rows = cursor.fetchall()
 
     similar_items = []
     for row in rows:
-        id, features_blob, name = row
+        product_id, features_blob, name = row
         features = np.frombuffer(features_blob, dtype=np.float32)
         distance = cosine(query_features[0], features)
-        similar_items.append([id, distance, name])
+        similar_items.append([product_id, distance, name])
     similar_items.sort(key=lambda x: x[1])
     conn.close()
     products = []
@@ -69,19 +72,21 @@ def find_similar_features(query_features, n: int) -> int:
 
 def get_image(ids: int):
     """
-    Get the base64 image based on the id
+    Get the base64 image based on the product_id
     """
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
     image_data = []
 
-    for id in ids:
-        cursor.execute('SELECT productname, filename, productUrl, about, category FROM features WHERE id=?', (id,))
+    for product_id in ids:
+        cursor.execute(
+            'SELECT product_name, filename, productUrl, about_product, category, product_desc FROM features WHERE product_id=?', (product_id,))
         data = cursor.fetchall()[0]
         if data:
-            productname, filename, productUrl, about, category = data
-            image_path = f'../amazon_images/{filename}'  # Update with actual path
+            product_name, filename, productUrl, about_product, category, product_desc = data
+            # Update with actual path
+            image_path = f'../amazon_images/{filename}'
             img = Image.open(image_path)
 
             # Convert image to base64
@@ -89,16 +94,87 @@ def get_image(ids: int):
             img.save(buffered, format="JPEG")
             img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
             image_data.append({
-                'name': productname,
+                'name': product_name,
                 'image': img_base64,
                 'product_url': productUrl,
-                'about': about,
+                'about': about_product,
                 'category': category,
+                'product_desc': product_desc
             })
         else:
+            conn.close()
             return jsonify({'error': 'Image not found'}), 404
     conn.close()
     return image_data
+
+
+def cross_sell(product_id):
+    """
+    Find the most similar products based on product_desc
+    """
+
+    def decode_pickle_array(pickle_bytes):
+        # Decode the pickle encoded column, 'vector'
+        return pickle.loads(pickle_bytes)
+
+    def convertToBase64Image(filename: str) -> str:
+        image_path = f'../amazon_images/{filename}'
+        img = Image.open(image_path)
+
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        return img_base64
+
+    conn = sqlite3.connect('feature_database.db')
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT product_name, filename, productUrl, about_product, category, product_desc, vector 
+        FROM features WHERE product_id=?
+        """, (product_id,))
+    data_base = cursor.fetchall()
+    data_base_df = pd.DataFrame(
+        data_base, columns=[desc[0] for desc in cursor.description])
+    data_base_df['vector'] = data_base_df['vector'].apply(decode_pickle_array)
+    base_vec = np.array([data_base_df['vector'][0]])
+    # print(base_vec, '\n')
+
+    cursor.execute(
+        """
+        SELECT product_name, filename, productUrl, about_product, category, product_desc, vector
+        FROM features WHERE product_id!=?
+        """, (product_id,))
+    data = cursor.fetchall()
+    data_df = pd.DataFrame(
+        data, columns=[desc[0] for desc in cursor.description])
+    data_df['vector'] = data_df['vector'].apply(decode_pickle_array)
+    mat = np.vstack(data_df['vector'])
+    # print(mat)
+    conn.close()
+
+    data_df['image'] = data_df['filename'].apply(convertToBase64Image)
+
+    cos_sim = cosine_similarity(base_vec, mat).flatten()
+    # print(cos_sim)
+    df = data_df.copy()
+    df['similarity'] = cos_sim
+    similarity = df.sort_values('similarity', ascending=False).head(10)
+    similarity_data = []
+    for i in range(len(similarity)):
+        similarity_data.append({
+            'name': similarity.iloc[i]['product_name'],
+            'product_url': similarity.iloc[i]['productUrl'],
+            'about': similarity.iloc[i]['about_product'],
+            'category': similarity.iloc[i]['category'],
+            'product_desc': similarity.iloc[i]['product_desc'],
+            'image': similarity.iloc[i]['image']
+        })
+    return similarity_data
 
 
 @app.route('/process-image/image-search', methods=['POST'])
@@ -108,12 +184,15 @@ def processImage():
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
     similar_imgs = find_similar_features(img_features, 4)
-    
+
     if similar_imgs:
-        response = get_image(similar_imgs)
-        return response
+        response_img = get_image(similar_imgs)
+        response_sell = cross_sell(similar_imgs[0])
+        return jsonify({'image_search': response_img, 'cross_sell': response_sell})
+
     else:
         return jsonify({"error": "No similar images found"}), 404
+
 
 @app.route('/process-image/image-categorization', methods=['POST'])
 def categorization():
@@ -133,11 +212,10 @@ def categorization():
                 result[position][1] += 1
             except:
                 categories[img["category"]] = i
-                result.append([img["category"],1])
+                result.append([img["category"], 1])
                 i += 1
-        result.sort(key = lambda x: x[1], reverse = True)
+        result.sort(key=lambda x: x[1], reverse=True)
         return result[0][0]
-        
 
 
 if __name__ == "__main__":

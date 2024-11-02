@@ -1,43 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
 
 .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    font-family:Verdana, Geneva, sans-serif;
-    font-size: 12px;
-    background-color: rgba(255, 255, 255, 0.861);
-    width: 100%;
-    margin-bottom: 5px;
-    padding: 10px;
-  }
-
-.logo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding-left: 10px;
-}
-
-.webTitle {
-    margin: 0px;
-    font-size: 15px;
-    font-weight: bolder;
-    font-family: Montserrat, sans-serif;
-}
-
-.appButton {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 17px;
+  background-color: rgba(94, 93, 93, 0.725);
+  width: 100%;
+  margin-bottom: 5px;
+  z-index: 50;
 }
 
 .headerButton {
-    padding: 8px;
-    margin-left: 70px;
-    margin-right: 20px;
+  padding: 8px;
+  color: white;
 }
 
 .headerButton:hover {
-    cursor: pointer;
+  cursor: pointer;
 }

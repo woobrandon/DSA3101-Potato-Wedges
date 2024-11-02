@@ -1,18 +1,34 @@
 import React, { useState } from "react";
 import styles from "./ProductFinder.module.css";
 import axios from "axios";
-import Header from "../components/Header";
+import { Header, ProductCard, ProductCardLong } from "../components";
 
-interface Data {
+interface ProcessedImage {
   image: string;
   about: string;
   product_url: string;
   name: string;
+  product_desc: string;
+  category: string;
+}
+
+interface ProcessedDescription {
+  image: string;
+  about: string;
+  product_url: string;
+  name: string;
+  product_desc: string;
+  category: string;
 }
 
 const ProductFinder: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [processedImages, setProcessedImages] = useState<string[] | null>(null);
+  const [processedImages, setProcessedImages] = useState<
+    ProcessedImage[] | null
+  >(null);
+  const [processedProducts, setProcessedProducts] = useState<
+    ProcessedDescription[]
+  >([]);
   const [productUrl, setProductUrl] = useState<string>("");
   const [productAbout, setProductAbout] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -41,10 +57,11 @@ const ProductFinder: React.FC = () => {
         }
       );
       console.log(response);
-      setProcessedImages(response.data.map((data: Data) => data.image));
-      setProductUrl(response.data[0].product_url);
-      setProductAbout(response.data[0].about);
-      setName(response.data[0].name);
+      setProcessedImages(response.data.image_search);
+      setProcessedProducts(response.data.cross_sell);
+      setProductUrl(response.data.image_search[0].product_url);
+      setProductAbout(response.data.image_search[0].about);
+      setName(response.data.image_search[0].name);
     } catch (error) {
       console.error("Error processing image:", error);
     }
@@ -88,12 +105,14 @@ const ProductFinder: React.FC = () => {
         <div className={styles.processedImageContainer}>
           <div className={styles.processedImageWrapper}>
             <img
-              src={`data:image/png;base64,${processedImages[0]}`}
+              src={`data:image/png;base64,${processedImages[0].image}`}
               alt="Processed"
               className={styles.processedImage}
             />
             <div className={styles.description}>
-              <a href={productUrl}>Product Link</a>
+              <a href={productUrl} target="_blank">
+                Product Link
+              </a>
               <p>
                 <strong>Product Name:</strong> {name}
               </p>
@@ -103,18 +122,33 @@ const ProductFinder: React.FC = () => {
             </div>
           </div>
           <div className={styles.possibleProcessedImageContainer}>
-            <p>Others also view</p>
+            <p>Other similar products (by image)</p>
             <div className={styles.possibleProcessedImageWrapper}>
-              <div>
-                {processedImages.slice(1, 6).map((img, id) => (
-                  <img
-                    key={id}
-                    src={`data:image/png;base64,${img}`}
-                    alt="Processed"
-                    className={styles.processedImagePossible}
-                  />
-                ))}
-              </div>
+              {processedImages.slice(1, 5).map((data, id) => (
+                <ProductCard
+                  key={id}
+                  imgSrc={`data:image/png;base64,${data.image}`}
+                  name={data.name}
+                  description={data.product_desc}
+                  link={data.product_url}
+                />
+              ))}
+            </div>
+          </div>
+          <div className={styles.possibleProcessedImageContainer}>
+            <p>Other similar products (by description)</p>
+            <div className={styles.possibleProcessedImageWrapper}>
+              {processedProducts.slice(1, 5).map((data, id) => (
+                <ProductCardLong
+                  key={id}
+                  imgSrc={`data:image/png;base64,${data.image}`}
+                  name={data.name}
+                  description={data.product_desc}
+                  link={data.product_url}
+                  about={data.about}
+                  category={data.category}
+                />
+              ))}
             </div>
           </div>
         </div>
