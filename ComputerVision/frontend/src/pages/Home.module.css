@@ -8,15 +8,8 @@
     width: 100%;
   }
 
-.bodyTextContainer {
+.Container {
   display: flex;
-  justify-content: space-around;
-}
-
-.bodyTextWrapper {
-  width: 50%;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  justify-content: flex-end;
+  margin-top: 400px;
 }
