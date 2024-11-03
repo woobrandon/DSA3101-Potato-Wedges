@@ -1,6 +1,8 @@
 .boxContainer {
     display: flex;
     flex-direction: row;
+    margin-left: 30px;
+    margin-right: 30px;
 }
 
 .boxContainer:hover {
@@ -10,9 +12,11 @@
 .box {
     display: flex;
     background-color: rgba(255, 255, 255, 0.807);
-    padding: 12px 20px;
     position: relative;
     font-size: 16px;
+    height: 150px;
+    padding-left:50px;
+    padding-right:50px;
   }
 
 .arrow {
