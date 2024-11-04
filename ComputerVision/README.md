@@ -52,3 +52,17 @@ A database named "feature_database.db" is created For easy and efficient access 
 | tokens        | BLOB  |
 | lemma         | BLOB  |
 | vector        | BLOB  |
+
+Each column represents a specific attribute of a product, where:
+- **`id`** is the unique identifier for each entry.
+- **`product_id`** is a text identifier for the product.
+- **`product_name`** and **`product_desc`** provide details about the product.
+- **`features`, `tokens`, `lemma`,** and **`vector`** store additional data used for analysis and searching.
+
+### Model
+For our project, we used ResNet50, a deep convolutional neural network, to extract the features from the images. The model contains 50 layers, 48 convolutionaery layers and 2 connected layers. The pretrained model "resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5" is used in our project for its desirable properties:
+- **`resnet50`**: The model is lightweight with only 50 years which enable us to run it locally withtout performance deficiencies.
+- **`tf`**: The weights are compatible with the TensorFlow library.
+- **`notop`**: The file excludes the weights for the final convolutional layers which is commonly used to image classification. For feature extraction, the final layer is excluded to return a feature vector.
+
+### Similar Images
