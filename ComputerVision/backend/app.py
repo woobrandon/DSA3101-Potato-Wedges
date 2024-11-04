@@ -81,10 +81,10 @@ def get_image(ids: int):
 
     for product_id in ids:
         cursor.execute(
-            'SELECT product_name, filename, productUrl, about_product, category, product_desc FROM features WHERE product_id=?', (product_id,))
+            'SELECT product_name, product_price, filename, productUrl, about_product, category, product_desc FROM features WHERE product_id=?', (product_id,))
         data = cursor.fetchall()[0]
         if data:
-            product_name, filename, productUrl, about_product, category, product_desc = data
+            product_name, product_price, filename, productUrl, about_product, category, product_desc = data
             # Update with actual path
             image_path = f'../amazon_images/{filename}'
             img = Image.open(image_path)
@@ -95,6 +95,7 @@ def get_image(ids: int):
             img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
             image_data.append({
                 'name': product_name,
+                'product_price': product_price,
                 'image': img_base64,
                 'product_url': productUrl,
                 'about': about_product,
@@ -108,7 +109,7 @@ def get_image(ids: int):
     return image_data
 
 
-def cross_sell(product_id):
+def cross_sell_and_up_sell(product_id) -> tuple[list, list]:
     """
     Find the most similar products based on product_desc
     """
@@ -134,7 +135,7 @@ def cross_sell(product_id):
 
     cursor.execute(
         """
-        SELECT product_name, filename, productUrl, about_product, category, product_desc, vector 
+        SELECT product_name, product_price, filename, productUrl, about_product, category, product_desc, vector 
         FROM features WHERE product_id=?
         """, (product_id,))
     data_base = cursor.fetchall()
@@ -146,7 +147,7 @@ def cross_sell(product_id):
 
     cursor.execute(
         """
-        SELECT product_name, filename, productUrl, about_product, category, product_desc, vector
+        SELECT product_name, product_price, filename, productUrl, about_product, category, product_desc, vector
         FROM features WHERE product_id!=?
         """, (product_id,))
     data = cursor.fetchall()
@@ -163,18 +164,37 @@ def cross_sell(product_id):
     # print(cos_sim)
     df = data_df.copy()
     df['similarity'] = cos_sim
-    similarity = df.sort_values('similarity', ascending=False).head(10)
-    similarity_data = []
-    for i in range(len(similarity)):
-        similarity_data.append({
-            'name': similarity.iloc[i]['product_name'],
-            'product_url': similarity.iloc[i]['productUrl'],
-            'about': similarity.iloc[i]['about_product'],
-            'category': similarity.iloc[i]['category'],
-            'product_desc': similarity.iloc[i]['product_desc'],
-            'image': similarity.iloc[i]['image']
+
+    # Cross_sell
+    cross_sell_similarity = df.sort_values(
+        'similarity', ascending=False).head(10)
+    cross_sell_data = []
+    for i in range(10):
+        cross_sell_data.append({
+            'name': cross_sell_similarity.iloc[i]['product_name'],
+            'product_price': cross_sell_similarity.iloc[i]['product_price'],
+            'product_url': cross_sell_similarity.iloc[i]['productUrl'],
+            'about': cross_sell_similarity.iloc[i]['about_product'],
+            'category': cross_sell_similarity.iloc[i]['category'],
+            'product_desc': cross_sell_similarity.iloc[i]['product_desc'],
+            'image': cross_sell_similarity.iloc[i]['image']
         })
-    return similarity_data
+
+    # Up_sell
+    up_sell_similarity = df.query(f'product_price > {data_base_df.loc[0, "product_price"]} & similarity >= 0.8').sort_values(
+        'similarity', ascending=False).head(10)
+    up_sell_data = []
+    for i in range(10):
+        up_sell_data.append({
+            'name': up_sell_similarity.iloc[i]['product_name'],
+            'product_price': up_sell_similarity.iloc[i]['product_price'],
+            'product_url': up_sell_similarity.iloc[i]['productUrl'],
+            'about': up_sell_similarity.iloc[i]['about_product'],
+            'category': up_sell_similarity.iloc[i]['category'],
+            'product_desc': up_sell_similarity.iloc[i]['product_desc'],
+            'image': up_sell_similarity.iloc[i]['image']
+        })
+    return cross_sell_data, up_sell_data
 
 
 @app.route('/process-image/image-search', methods=['POST'])
@@ -187,8 +207,8 @@ def processImage():
 
     if similar_imgs:
         response_img = get_image(similar_imgs)
-        response_sell = cross_sell(similar_imgs[0])
-        return jsonify({'image_search': response_img, 'cross_sell': response_sell})
+        response_sell = cross_sell_and_up_sell(similar_imgs[0])
+        return jsonify({'image_search': response_img, 'cross_sell': response_sell[0], 'up_sell': response_sell[1]})
 
     else:
         return jsonify({"error": "No similar images found"}), 404

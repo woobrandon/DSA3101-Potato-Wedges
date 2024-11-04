@@ -4,6 +4,7 @@ import styles from "./ProductCardLong.module.css";
 interface Props {
   imgSrc: string;
   name: string;
+  price: string;
   description: string;
   link: string;
   about: string;
@@ -13,6 +14,7 @@ interface Props {
 const ProductCardLong: React.FC<Props> = ({
   imgSrc,
   name,
+  price,
   description,
   link,
   about,
@@ -33,7 +35,11 @@ const ProductCardLong: React.FC<Props> = ({
             <strong>About: </strong> {about}
           </span>
           <br />
-          <strong>Category: </strong> {category}
+          <span>
+            <strong>Category: </strong> {category}
+          </span>
+          <br />
+          <strong>Price: </strong> {price}
         </p>
       </div>
     </section>

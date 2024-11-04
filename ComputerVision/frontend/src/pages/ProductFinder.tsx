@@ -7,6 +7,7 @@ interface ProcessedImage {
   image: string;
   about: string;
   product_url: string;
+  product_price: number;
   name: string;
   product_desc: string;
   category: string;
@@ -16,6 +17,7 @@ interface ProcessedDescription {
   image: string;
   about: string;
   product_url: string;
+  product_price: number;
   name: string;
   product_desc: string;
   category: string;
@@ -26,11 +28,11 @@ const ProductFinder: React.FC = () => {
   const [processedImages, setProcessedImages] = useState<
     ProcessedImage[] | null
   >(null);
-  const [processedProducts, setProcessedProducts] = useState<
-    ProcessedDescription[]
-  >([]);
+  const [crossSell, setCrossSell] = useState<ProcessedDescription[]>([]);
+  const [upSell, setUpSell] = useState<ProcessedDescription[]>([]);
   const [productUrl, setProductUrl] = useState<string>("");
   const [productAbout, setProductAbout] = useState<string>("");
+  const [productPrice, setProductPrice] = useState<string>("");
   const [name, setName] = useState<string>("");
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,9 +60,11 @@ const ProductFinder: React.FC = () => {
       );
       console.log(response);
       setProcessedImages(response.data.image_search);
-      setProcessedProducts(response.data.cross_sell);
+      setCrossSell(response.data.cross_sell);
+      setUpSell(response.data.up_sell);
       setProductUrl(response.data.image_search[0].product_url);
       setProductAbout(response.data.image_search[0].about);
+      setProductPrice(`₹${response.data.image_search[0].product_price}`);
       setName(response.data.image_search[0].name);
     } catch (error) {
       console.error("Error processing image:", error);
@@ -119,6 +123,9 @@ const ProductFinder: React.FC = () => {
               <p>
                 <strong>About:</strong> {productAbout}
               </p>
+              <p>
+                <strong>Price:</strong> {productPrice}
+              </p>
             </div>
           </div>
           <div className={styles.possibleProcessedImageContainer}>
@@ -136,13 +143,31 @@ const ProductFinder: React.FC = () => {
             </div>
           </div>
           <div className={styles.possibleProcessedImageContainer}>
-            <p>Other similar products (by description)</p>
+            <p>Other similar products (by description, cross sell)</p>
             <div className={styles.possibleProcessedImageWrapper}>
-              {processedProducts.slice(1, 5).map((data, id) => (
+              {crossSell.slice(1, 5).map((data, id) => (
                 <ProductCardLong
                   key={id}
                   imgSrc={`data:image/png;base64,${data.image}`}
                   name={data.name}
+                  price={`₹${data.product_price}`}
+                  description={data.product_desc}
+                  link={data.product_url}
+                  about={data.about}
+                  category={data.category}
+                />
+              ))}
+            </div>
+          </div>
+          <div className={styles.possibleProcessedImageContainer}>
+            <p>Other similar products (by description, up sell)</p>
+            <div className={styles.possibleProcessedImageWrapper}>
+              {upSell.slice(1, 5).map((data, id) => (
+                <ProductCardLong
+                  key={id}
+                  imgSrc={`data:image/png;base64,${data.image}`}
+                  name={data.name}
+                  price={`₹${data.product_price}`}
                   description={data.product_desc}
                   link={data.product_url}
                   about={data.about}

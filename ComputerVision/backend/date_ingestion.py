@@ -150,6 +150,7 @@ def create_table():
         id INTEGER PRIMARY KEY,
         product_id TEXT,
         product_name TEXT,
+        product_price FLOAT,
         filename TEXT,
         features BLOB,
         productUrl TEXT,
@@ -167,12 +168,14 @@ def create_table():
     return
 
 
-def insert_features(id, product_id, productname, filename, features, productUrl, about, category, product_desc, tokens, lemma, vector):
+def insert_features(id, product_id, productname, product_price, filename, features, productUrl, about, category, product_desc, tokens, lemma, vector):
     """
     Inserts features into database after extracting it with the extract function
     """
     about = about.replace("|", ", ")
     category = category.replace("|", ", ")
+    product_price = float(product_price.replace(
+        '‚Çπ', '').replace('₹', '').replace(',', '').strip())
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
@@ -183,9 +186,9 @@ def insert_features(id, product_id, productname, filename, features, productUrl,
     vector = pickle.dumps(vector)
 
     cursor.execute('''
-    INSERT INTO features (id, product_id, product_name, filename, features, productUrl, about_product, category, product_desc, tokens, lemma, vector) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (id, product_id, productname, filename, features_blob, productUrl, about, category, product_desc, tokens, lemma, vector))
+    INSERT INTO features (id, product_id, product_name, product_price, filename, features, productUrl, about_product, category, product_desc, tokens, lemma, vector) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (id, product_id, productname, product_price, filename, features_blob, productUrl, about, category, product_desc, tokens, lemma, vector))
 
     conn.commit()
     conn.close()
@@ -249,11 +252,12 @@ for img in os.listdir(folder_path):
     try:
         img_path = os.path.join(folder_path, img)
         img_features = extract_features(img_path)
-        insert_features(db_id, amazon_df["product_id"][int(img[6:-4])-1], amazon_df["product_name"][int(img[6:-4])-1], img, img_features, amazon_df["product_link"][int(
-            img[6:-4])-1], amazon_df["about_product"][int(img[6:-4])-1], amazon_df["category"][int(img[6:-4])-1],
-            amazon_df["product_desc"][int(
-                img[6:-4])-1], amazon_df["tokens"][int(img[6:-4])-1],
-            amazon_df["lemma"][int(img[6:-4])-1], amazon_df["vector"][int(img[6:-4])-1])
+        insert_features(db_id, amazon_df["product_id"][int(img[6:-4])-1], amazon_df["product_name"][int(img[6:-4])-1], amazon_df["discounted_price"][int(img[6:-4])-1],
+                        img, img_features, amazon_df["product_link"][int(
+                            img[6:-4])-1], amazon_df["about_product"][int(img[6:-4])-1], amazon_df["category"][int(img[6:-4])-1],
+                        amazon_df["product_desc"][int(
+                            img[6:-4])-1], amazon_df["tokens"][int(img[6:-4])-1],
+                        amazon_df["lemma"][int(img[6:-4])-1], amazon_df["vector"][int(img[6:-4])-1])
         db_id += 1
     except Exception as e:
         print(str(img) + " was unable to be inserted: ", e)
