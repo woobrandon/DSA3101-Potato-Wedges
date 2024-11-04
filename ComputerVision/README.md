@@ -37,20 +37,18 @@ The data from the amazon csv file is relatively clean but unfortunately, the ima
 ### Database
 A database named "feature_database.db" is created For easy and efficient access to the data with the primary key being the id.
 
-+--------------+-------+
-| Column Name  | Type  |
-+--------------+-------+
-| id           | INT   |
-| product_id   | TEXT  |
-| product_name | TEXT  |
-| product_price| FLOAT | 
-| filename     | TEXT  |
-| features     | BLOB  |
-| productUrl   | TEXT  |
-| about_product| TEXT  |
-| category     | TEXT  |
-| product_desc | TEXT  |
-| tokens       | BLOB  |
-| lemma        | BLOB  |
-| vector       | BLOB  |
-+--------------+-------+
+| Column Name   | Type  |
+|---------------|-------|
+| id            | INT   |
+| product_id    | TEXT  |
+| product_name  | TEXT  |
+| product_price | FLOAT | 
+| filename      | TEXT  |
+| features      | BLOB  |
+| productUrl    | TEXT  |
+| about_product | TEXT  |
+| category      | TEXT  |
+| product_desc  | TEXT  |
+| tokens        | BLOB  |
+| lemma         | BLOB  |
+| vector        | BLOB  |
