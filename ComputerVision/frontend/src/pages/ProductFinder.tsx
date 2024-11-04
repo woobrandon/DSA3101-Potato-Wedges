@@ -161,20 +161,26 @@ const ProductFinder: React.FC = () => {
           </div>
           <div className={styles.possibleProcessedImageContainer}>
             <p>Other similar products (by description, up sell)</p>
-            <div className={styles.possibleProcessedImageWrapper}>
-              {upSell.slice(1, 5).map((data, id) => (
-                <ProductCardLong
-                  key={id}
-                  imgSrc={`data:image/png;base64,${data.image}`}
-                  name={data.name}
-                  price={`₹${data.product_price}`}
-                  description={data.product_desc}
-                  link={data.product_url}
-                  about={data.about}
-                  category={data.category}
-                />
-              ))}
-            </div>
+            {upSell ? (
+              <div className={styles.possibleProcessedImageWrapper}>
+                {upSell.slice(1, 5).map((data, id) => (
+                  <ProductCardLong
+                    key={id}
+                    imgSrc={`data:image/png;base64,${data.image}`}
+                    name={data.name}
+                    price={`₹${data.product_price}`}
+                    description={data.product_desc}
+                    link={data.product_url}
+                    about={data.about}
+                    category={data.category}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div>
+                Product is already expensive and there is nothing to up sell ;c
+              </div>
+            )}
           </div>
         </div>
       )}
