@@ -34,6 +34,8 @@ const ProductFinder: React.FC = () => {
   const [productAbout, setProductAbout] = useState<string>("");
   const [productPrice, setProductPrice] = useState<string>("");
   const [name, setName] = useState<string>("");
+  const [processed, setProcessed] = useState<boolean>(false);
+  const [noImage, setNoImage] = useState<boolean>(true);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -51,6 +53,7 @@ const ProductFinder: React.FC = () => {
   };
 
   const handleProcessImage = async (image: string) => {
+    setProcessed(true);
     try {
       const response = await axios.post(
         "http://localhost:5001/process-image/image-search",
@@ -66,7 +69,9 @@ const ProductFinder: React.FC = () => {
       setProductAbout(response.data.image_search[0].about);
       setProductPrice(`₹${response.data.image_search[0].product_price}`);
       setName(response.data.image_search[0].name);
+      setNoImage(false);
     } catch (error) {
+      setNoImage(true);
       console.error("Error processing image:", error);
     }
   };
@@ -104,8 +109,15 @@ const ProductFinder: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {processedImages && ( // Display the processed image
+      {processed && noImage &&( // if there is no similar image to be found
+        <div className={styles.processedImageContainer}>
+          <div className={styles.processedImageWrapper}>
+            <p>No similar image was found! Please upload another image.</p>
+          </div>
+        </div>
+      )
+      }
+      {processedImages &&( // Display the processed image
         <div className={styles.processedImageContainer}>
           <div className={styles.processedImageWrapper}>
             <img

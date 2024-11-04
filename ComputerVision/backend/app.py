@@ -39,7 +39,7 @@ def extract_features(image_data: str):
     return features
 
 
-def find_similar_features(query_features, n: int) -> int:
+def find_similar_features(query_features, n: int, threshold: float) -> int:
     """
     Find the most similar image based on features extracted from ResNet50 model and returns the product_id of the most similar image
     """
@@ -62,6 +62,8 @@ def find_similar_features(query_features, n: int) -> int:
     if similar_items:
         while len(products) < n+1:
             curr_img = similar_items.pop(0)
+            if curr_img[1] > threshold:
+                break
             if curr_img[2] not in products:
                 result.append(curr_img[0])
                 products.append(curr_img[2])
@@ -203,13 +205,12 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs = find_similar_features(img_features, 4)
-
+    similar_imgs = find_similar_features(img_features, 4, 0.3)
+    print(similar_imgs)
     if similar_imgs:
         response_img = get_image(similar_imgs)
         response_sell = cross_sell_and_up_sell(similar_imgs[0])
         return jsonify({'image_search': response_img, 'cross_sell': response_sell[0], 'up_sell': response_sell[1]})
-
     else:
         return jsonify({"error": "No similar images found"}), 404
 
