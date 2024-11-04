@@ -32,13 +32,13 @@
 To find visually similar products from the amazon dataset, we use a pretrained computer vision model ResNet 50 is used to find images with the most similarity
 
 ### How to run data_ingestion.py
-1. Ensure that you have the driver file installed in the current directory. If you do not have chrome installed on your device, installed the neccssary driver:
-**Firefox**: https://github.com/mozilla/geckodriver/releases
+1. Ensure that you have the driver file installed in the current directory. If you do not have chrome installed on your device, installed the neccssary driver:<br>
+**Firefox**: https://github.com/mozilla/geckodriver/releases<br>
 **Safari**: 
-- Go to Perferences in Safari
-- click on Advanced tab
-- Check the option that says "Show Develop menu in menu bar"
-- From Develop menu in menu bar, select "Allow Remote Automation"
+- Go to **Perferences** in **Safari**
+- click on **Advanced** tab
+- Check the option that says **"Show Develop menu in menu bar"**
+- From **Develop** menu in menu bar, select **"Allow Remote Automation"**
 
 2. Install the neccessary libraries by running the command in the backend directory:
    ```sh
@@ -87,6 +87,41 @@ For our project, we used ResNet50, a deep convolutional neural network, to extra
 Raw PIL does not effectively capture high level patterns like shapes and objects. ResNet50 captures the important features of an image and express it in a fixed-length vector which is useful for us to compare images later.
 
 ### Similar Images
-To determine the similarity between 2 images, the cosine similarity is calculated between the 2 images. Cosine Similarity, like its name suggests, is the cosine of two non-zero vectors (in this case the image feature vectors) derived using the Euclidean dot product formula: {\displaystyle \mathbf {A} \cdot \mathbf {B} =\left\|\mathbf {A} \right\|\left\|\mathbf {B} \right\|\cos \theta }. 2 proportional vectors (similar images) have a cosine similarity of 1, whereas 2 othorgonal vectors (different images) have a cosine value of 0. 
+To determine the similarity between 2 images, the cosine similarity is calculated between the 2 images. Cosine Similarity, like its name suggests, is the cosine of two non-zero vectors (in this case the image feature vectors) derived using the Euclidean dot product formula:
+
+$$
+\mathbf{A} \cdot \mathbf{B} = \|\mathbf{A}\| \|\mathbf{B}\| \cos \theta
+$$
+
+2 proportional vectors (similar images) have a cosine similarity of 1, whereas 2 othorgonal vectors (different images) have a cosine value of 0. 
 
 Each image cosine similarity score is calculated with the uploaded image and sorted in descending order. An image below a certain threshold (0.8 for our project) is deemed as visually contrasting. This ensure that if the uploaded image does not visually look similar to an amazon product, no images will be return.
+
+### How to run webpage
+
+1. Ensure all the neccessary libraries are installed. Otherwise, Running the command in the backend directory:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+2. If npm is not installed in the local environment or local desktop,
+For Windows:
+- Go to https://nodejs.org/en to install Node.js
+For Mac:
+- run (if you have Homebrew):
+   ```sh
+   brew install node
+   ```
+- Verfiy installation by running the command:
+   ```sh
+   node -v
+   npm -v
+   ```
+
+3. Run the app.py found in the ./ComputerVision/backend/ folder.
+
+4. Run the command in a separate terminal at the directory ./ComputerVision/frontend/src
+   ```sh
+   npm start
+   ```
+5. Go to your brower of choice and type localhost:3000 to see the webpage
