@@ -221,7 +221,7 @@ def categorization():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs_id = find_similar_features(img_features, 100)
+    similar_imgs_id = find_similar_features(img_features, 100, 0.3)
     if similar_imgs_id:
         categories = {}
         result = []

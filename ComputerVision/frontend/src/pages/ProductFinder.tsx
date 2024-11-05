@@ -25,6 +25,7 @@ interface ProcessedDescription {
 
 const ProductFinder: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [processedImages, setProcessedImages] = useState<
     ProcessedImage[] | null
   >(null);
@@ -53,7 +54,7 @@ const ProductFinder: React.FC = () => {
   };
 
   const handleProcessImage = async (image: string) => {
-    setProcessed(true);
+    setIsLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:5001/process-image/image-search",
@@ -74,6 +75,7 @@ const ProductFinder: React.FC = () => {
       setNoImage(true);
       console.error("Error processing image:", error);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -109,7 +111,7 @@ const ProductFinder: React.FC = () => {
           </div>
         </div>
       </div>
-      {processed && noImage &&( // if there is no similar image to be found
+      {!isLoading && noImage && processedImages &&( // if there is no similar image to be found
         <div className={styles.processedImageContainer}>
           <div className={styles.processedImageWrapper}>
             <p>No similar image was found! Please upload another image.</p>
