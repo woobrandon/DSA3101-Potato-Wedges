@@ -1,89 +1,131 @@
 import pandas as pd
-from statsmodels.tsa.arima.model import ARIMA
-import xgboost as xgb
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import norm
 
-cleaned_synthetic_v3 = pd.read_csv("cleaned_synthetic_v3.csv")
+# Load data
+data = pd.read_csv('train_predictions.csv')
 
-# Step 1: ARIMA Forecasting for Time Series Data
+# Convert 'year_month' to datetime format
+data['year_month'] = pd.to_datetime(data['year_month'], format='%Y-%m-%d')
 
-# Filter for one product (you can loop over all products)
-product_id = 'GGOEAAYC068756'  # Replace with a valid product_id
-product_data = cleaned_synthetic_v3[cleaned_synthetic_v3['product_id'] == product_id]
+# Step 1: Calculate mean and standard deviation of demand (forecast_qty) for each category
+category_demand_stats = data.groupby('product_category')['forecast_qty'].agg(['mean', 'std']).reset_index()
+category_demand_stats['CV'] = category_demand_stats['std'] / category_demand_stats['mean']  # Coefficient of Variation
 
-# Convert 'year_month' to datetime and set as index
-product_data['year_month'] = pd.to_datetime(product_data['year_month'], format='%Y-%m-%d')
-product_data.set_index('year_month', inplace=True)
+# Step 2: Define a function to assign service levels based on CV with adjusted ranges
+def assign_service_level(cv):
+    if cv < 1:
+        return 0.90  # Low variability
+    elif 1 <= cv < 2:
+        return 0.93  # Moderate variability
+    elif 2 <= cv < 3:
+        return 0.95  # High variability
+    elif 3 <= cv < 4:
+        return 0.97  # Very high variability
+    else:
+        return 0.98  # Extremely high variability
 
-# Aggregate monthly sales (if needed)
-monthly_sales = product_data['present_total_qty'].resample('M').sum()
+# Apply the function to determine service levels based on CV
+category_demand_stats['service_level'] = category_demand_stats['CV'].apply(assign_service_level)
 
-# Train ARIMA model
-arima_model = ARIMA(monthly_sales, order=(1, 1, 1))  # You can auto-tune ARIMA parameters with auto_arima
-arima_model_fit = arima_model.fit()
+# Step 3: Map the calculated service levels back to the main data
+service_level_mapping = category_demand_stats.set_index('product_category')['service_level'].to_dict()
+data['service_level'] = data['product_category'].map(service_level_mapping)
 
-# Forecast the next 1 month using ARIMA (baseline forecast)
-arima_forecast = arima_model_fit.forecast(steps=1)[0]  # Get next month's forecast
+# Calculate Z-score based on the dynamically assigned service level
+data['Z_score'] = data['service_level'].apply(lambda x: norm.ppf(x))
 
-# Step 2: Feature Engineering for XGBoost
+# Display results
+print(category_demand_stats[['product_category', 'CV', 'service_level']])
 
-# Add lag feature for previous month's sales
-product_data['prev_month_sales'] = product_data['present_total_qty'].shift(1)
 
-# Create additional features like 'month' and 'year' from the datetime index
-product_data['month'] = product_data.index.month
-product_data['year'] = product_data.index.year
 
-# Drop the first row with NaN (because of the shift)
-product_data.dropna(inplace=True)
 
-# Features and target
-X = product_data[['month', 'year', 'product_price', 'prev_month_sales']]
-y = product_data['present_total_qty']
+# Step 1: Map Product Categories to Profit Margins
+# Define profit margin mapping for each product category based on industry data
+profit_margin_mapping = {
+    'Accessories': 0.46,
+    'Apparel': 0.416,
+    'Bags': 0.416,
+    'Drinkware': 0.478,
+    'Electronics': 0.337,
+    'Fun': 0.462,
+    'Gift Cards': 0.401,
+    'Headgear': 0.416,
+    'Housewares': 0.375,
+    'Lifestyle': 0.401,
+    'Notebooks & Journals': 0.401,
+    'Office': 0.337
+}
 
-# Step 3: Train XGBoost on top of ARIMA
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+# Map the product categories to their respective gross profit margins
+data['gross_profit_margin'] = data['product_category'].map(profit_margin_mapping)
 
-# Initialize and train the XGBoost model
-xgb_model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100)
-xgb_model.fit(X_train, y_train)
+# Step 2: Calculate Demand Variability (Standard Deviation of Demand)
+# Group by product_id and calculate standard deviation of demand to measure variability
+data['demand_variability'] = data.groupby('product_id')['forecast_qty'].transform('std').fillna(0)
 
-# Make predictions using XGBoost (deviations from ARIMA forecast)
-xgb_pred = xgb_model.predict(X_test)
+# Step 3: Set Lead Time and Base Service Level
+lead_time = 2  # Lead time in weeks (adjust based on actual lead time)
+base_service_level = 0.95  # Base service level (e.g., 95%)
 
-# Evaluate the XGBoost model
-rmse_xgb = mean_squared_error(y_test, xgb_pred, squared=False)
-print(f"XGBoost Test RMSE: {rmse_xgb}")
+# Step 4: Dynamic Service Level Based on Product Category
+# Set higher service levels for certain product categories 
+service_level_mapping = {
+    'Accessories': 0.95,
+    'Apparel': 0.97,
+    'Bags': 0.95,
+    'Drinkware': 0.95,
+    'Electronics': 0.95,
+    'Fun': 0.95,
+    'Gift Cards': 0.93,
+    'Headgear': 0.98,
+    'Housewares': 0.93,
+    'Lifestyle': 0.95,
+    'Notebooks & Journals': 0.95,
+    'Office': 0.97
+}
+data['service_level'] = data['product_category'].map(service_level_mapping).fillna(base_service_level)
 
-# Step 4: Combine ARIMA and XGBoost Predictions
-# Forecast for the next month using XGBoost
-X_new = pd.DataFrame({
-    'month': [7],  # July
-    'year': [2017],  # Forecasting for July 2017
-    'product_price': [product_data['product_price'].iloc[-1]],  # Use the most recent price
-    'prev_month_sales': [arima_forecast]  # Use ARIMA forecast as previous month's sales
-})
+# Calculate Z-score based on service level for each product
+data['Z_score'] = data['service_level'].apply(lambda x: norm.ppf(x))
 
-# Predict deviations from ARIMA using XGBoost
-xgb_forecast = xgb_model.predict(X_new)[0]
+# Step 5: Base Safety Stock Calculation
+# Calculate base safety stock using demand variability, lead time, and service level Z-score
+data['base_safety_stock'] = data['Z_score'] * data['demand_variability'] * np.sqrt(lead_time)
 
-# Combine ARIMA and XGBoost forecasts
-final_forecast = arima_forecast + xgb_forecast
+# Step 6: Adjust Safety Stock with Profit Margin
+# Scaling factor for profit margin to prioritize high-margin items
+profit_margin_scale = 0.3
+data['adjusted_safety_stock'] = data['base_safety_stock'] * (1 + data['gross_profit_margin'] * profit_margin_scale)
 
-print(f"Final Combined Forecast for July 2017: {final_forecast}")
+# Step 7: Seasonal Adjustment (Optional)
+# Assume seasonal factors for certain months (e.g., holiday season in December)
+data['month'] = data['year_month'].dt.month
+seasonal_multiplier = 1.2  # 20% additional buffer during peak months (e.g., December)
+data['seasonal_adjustment'] = np.where(data['month'] == 12, seasonal_multiplier, 1.0)
+data['final_safety_stock'] = data['adjusted_safety_stock'] * data['seasonal_adjustment']
 
-# Plot the results
-plt.figure(figsize=(10, 6))
-plt.plot(monthly_sales, label='Historical Sales')
-plt.axvline(monthly_sales.index[-1], color='gray', linestyle='--', label='Forecast Period')
-plt.plot([monthly_sales.index[-1] + pd.DateOffset(months=1)], [final_forecast], 'ro', label='Combined Forecast')
-plt.title(f"Hybrid ARIMA + XGBoost Forecast for Product {product_id}")
-plt.legend()
-plt.show()
+# Step 8: Calculate Reorder Amount
+# Add safety stock to forecasted demand to determine reorder amount
+data['reorder_amount'] = np.maximum(0, data['forecast_qty'] + data['final_safety_stock'] - data['forecast_qty'])
 
-# Now you can use the final forecast to adjust your inventory for the next month
-initial_stock = 100
-reorder_amount = max(0, final_forecast - initial_stock)
-print(f"Reorder amount for July 2017: {reorder_amount}")
+# Step 9: Final Adjustments for High-Variability Items
+# For items with high demand variability, add an additional buffer
+high_variability_threshold = 10  # Threshold for high variability
+variability_multiplier = 1.1  # Extra 10% buffer for high-variability items
+data['final_reorder_amount'] = np.where(
+    data['demand_variability'] > high_variability_threshold,
+    data['reorder_amount'] * variability_multiplier,
+    data['reorder_amount']
+)
+data['final_reorder_amount'] = np.ceil(data['final_reorder_amount'])
+
+
+# Group by month and product to calculate monthly reorder amounts if needed
+monthly_reorder = data.groupby([data['year_month'].dt.to_period('M'), 'product_id'])['final_reorder_amount'].sum().reset_index()
+monthly_reorder['year_month'] = monthly_reorder['year_month'].dt.to_timestamp()
+
+
+# Display results
+print(monthly_reorder.head())
