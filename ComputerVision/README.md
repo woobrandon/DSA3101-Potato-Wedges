@@ -93,9 +93,9 @@ $$
 \mathbf{A} \cdot \mathbf{B} = \|\mathbf{A}\| \|\mathbf{B}\| \cos \theta
 $$
 
-2 proportional vectors (similar images) have a cosine similarity of 1, whereas 2 othorgonal vectors (different images) have a cosine value of 0. 
+2 proportional vectors (similar images) have a cosine similarity of 1, whereas 2 othorgonal vectors (different images) have a cosine value of 0. In our project, we use cosine distance which is equivalent to 1 - cosine simialrity.
 
-Each image cosine similarity score is calculated with the uploaded image and sorted in descending order. An image below a certain threshold (0.8 for our project) is deemed as visually contrasting. This ensure that if the uploaded image does not visually look similar to an amazon product, no images will be return.
+Each image's cosine distance is calculated with the uploaded image and sorted in ascending order. An image above a certain threshold (0.3 for our project) is deemed as visually contrasting. This ensure that if the uploaded image does not visually look similar to an amazon product, no images will be return.
 
 ### How to run webpage
 

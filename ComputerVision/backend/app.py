@@ -6,6 +6,7 @@ from flask_cors import CORS
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
+from scipy.spatial.distance import cosine
 from PIL import Image
 from io import BytesIO
 import pickle
@@ -42,7 +43,7 @@ def find_similar_features(query_features, n: int, threshold: float) -> int:
     """
     Find the most similar image based on features extracted from ResNet50 model and returns the product_id of the most similar image
     """
-    print(query_features)
+    
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
@@ -53,16 +54,16 @@ def find_similar_features(query_features, n: int, threshold: float) -> int:
     for row in rows:
         product_id, features_blob, name = row
         features = np.frombuffer(features_blob, dtype=np.float32)
-        cos_sim = cosine_similarity(query_features[0], features)
-        similar_items.append([product_id, cos_sim, name])
-    similar_items.sort(key=lambda x: x[1], reverse = True)
+        distance = cosine(query_features[0], features)
+        similar_items.append([product_id, distance, name])
+    similar_items.sort(key=lambda x: x[1])
     conn.close()
     products = []
     result = []
     if similar_items:
         while len(products) < n+1:
             curr_img = similar_items.pop(0)
-            if curr_img[1] <= threshold:
+            if curr_img[1] >= threshold:
                 break
             if curr_img[2] not in products:
                 result.append(curr_img[0])
@@ -205,8 +206,7 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs = find_similar_features(img_features, 4, 0.8)
-    print(similar_imgs)
+    similar_imgs = find_similar_features(img_features, 4, 0.3)
     if similar_imgs:
         response_img = get_image(similar_imgs)
         response_sell = cross_sell_and_up_sell(similar_imgs[0])
