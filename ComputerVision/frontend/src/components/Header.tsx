@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./Header.module.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png"
 
 const Header = () => {
