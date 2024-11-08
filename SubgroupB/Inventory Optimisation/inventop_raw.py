@@ -129,3 +129,29 @@ monthly_reorder['year_month'] = monthly_reorder['year_month'].dt.to_timestamp()
 
 # Display results
 print(monthly_reorder.head())
+
+
+test_data = pd.read_csv('test_predictions.csv')
+test_data['year_month'] = pd.to_datetime(test_data['year_month'], format='%Y-%m-%d')
+
+test_data['service_level'] = test_data['product_category'].map(service_level_mapping)
+test_data['gross_profit_margin'] = test_data['product_category'].map(profit_margin_mapping)
+test_data['demand_variability'] = test_data.groupby('product_id')['forecast_qty'].transform('std').fillna(0)
+test_data['Z_score'] = test_data['service_level'].apply(lambda x: norm.ppf(x))
+test_data['base_safety_stock'] = test_data['Z_score'] * test_data['demand_variability'] * np.sqrt(lead_time)
+test_data['adjusted_safety_stock'] = test_data['base_safety_stock'] * (1 + test_data['gross_profit_margin'] * profit_margin_scale)
+test_data['seasonal_adjustment'] = np.where(test_data['year_month'].dt.month == 12, seasonal_multiplier, 1.0)
+test_data['final_safety_stock'] = test_data['adjusted_safety_stock'] * test_data['seasonal_adjustment']
+test_data['reorder_amount'] = np.maximum(0, test_data['forecast_qty'] + test_data['final_safety_stock'] - test_data['forecast_qty'])
+test_data['final_reorder_amount'] = np.where(
+    test_data['demand_variability'] > high_variability_threshold,
+    test_data['reorder_amount'] * variability_multiplier,
+    test_data['reorder_amount']
+)
+test_data['final_reorder_amount'] = np.ceil(test_data['final_reorder_amount'])
+
+monthly_reorder_test = test_data.groupby([test_data['year_month'].dt.to_period('M'), 'product_id'])['final_reorder_amount'].sum().reset_index()
+monthly_reorder_test['year_month'] = monthly_reorder_test['year_month'].dt.to_timestamp()
+
+print("\nNext Month's Reorder Plan:")
+print(monthly_reorder_test)
