@@ -3,25 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forecast Quantity</title>
+    <title>Demand Forecasting</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Container for left and right sections */
+        .container {
+            display: flex;
+            justify-content: space-between; /* Space out the left and right */
+            width: 100%; /* Full width */
+            max-width: 1200px; /* Max width for larger screens */
+        }
+
+        /* Left section - header and form */
+        .left {
+            width: 45%; /* You can adjust this as needed */
+            margin-top: 200px
+        }
+
+        /* Right section - prediction result and image */
+        .right {
+            width: 45%; /* You can adjust this as needed */
+            padding-left: 10px; /* Add some space between sections */
+            margin-top: 150px;
+        }
+
+        h1, h2 {
+            font-family: 'Lato', sans-serif;
+        }
+
+        p {
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        img {
+            width: 100%; /* Make image responsive */
+            max-width: 1000px; /* Optional: set max width for image */
+        }
+    </style>
 </head>
 <body>
-    <h1>Enter Product ID and Price</h1>
-    <form method="post" action="/">
-        <label for="input_text">Input (format: ID, Price):</label>
-        <input type="text" id="input_text" name="input_text" required>
-        <button type="submit">Submit</button>
-    </form>
+    <div class="container">
+        <!-- Left section -->
+        <div class="left">
+            <h1>Find the forecasted demand for your product of choice</h1>
+            <form method="post" action="/">
+                <label for="input_text">Please input using the format (ID, Price):</label>
+                <input type="text" id="input_text" name="input_text" required>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
 
-    {% if result %}
-        <h2>Result:</h2>
-        <p>{{ result }}</p>
-    {% endif %}
-    {% if image_path %}
-        <h2>Generated Image:</h2>
-        <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Forecast Image" width="600" height="400">
-
-    {% endif %}
-    
+        <!-- Right section -->
+        <div class="right">
+            {% if result %}
+                <h2>Prediction for next month:</h2>
+                <p>{{ result }}</p>
+            {% endif %}
+            {% if image_path %}
+                <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Forecast Image">
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>
