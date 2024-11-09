@@ -1,18 +1,17 @@
+!pip install pandas numpy matplotlib scipy
+
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-# Load data
 data = pd.read_csv('train_predictions.csv')
-
-# Convert 'year_month' to datetime format
 data['year_month'] = pd.to_datetime(data['year_month'], format='%Y-%m-%d')
+print(data.head())
 
-# Step 1: Calculate mean and standard deviation of demand (forecast_qty) for each category
 category_demand_stats = data.groupby('product_category')['forecast_qty'].agg(['mean', 'std']).reset_index()
-category_demand_stats['CV'] = category_demand_stats['std'] / category_demand_stats['mean']  # Coefficient of Variation
+category_demand_stats['CV'] = category_demand_stats['std'] / category_demand_stats['mean']
 
-# Step 2: Define a function to assign service levels based on CV with adjusted ranges
 def assign_service_level(cv):
     if cv < 1:
         return 0.90  # Low variability
@@ -25,24 +24,15 @@ def assign_service_level(cv):
     else:
         return 0.98  # Extremely high variability
 
-# Apply the function to determine service levels based on CV
 category_demand_stats['service_level'] = category_demand_stats['CV'].apply(assign_service_level)
 
-# Step 3: Map the calculated service levels back to the main data
 service_level_mapping = category_demand_stats.set_index('product_category')['service_level'].to_dict()
 data['service_level'] = data['product_category'].map(service_level_mapping)
-
-# Calculate Z-score based on the dynamically assigned service level
 data['Z_score'] = data['service_level'].apply(lambda x: norm.ppf(x))
 
-# Display results
 print(category_demand_stats[['product_category', 'CV', 'service_level']])
 
 
-
-
-# Step 1: Map Product Categories to Profit Margins
-# Define profit margin mapping for each product category based on industry data
 profit_margin_mapping = {
     'Accessories': 0.46,
     'Apparel': 0.416,
@@ -58,19 +48,13 @@ profit_margin_mapping = {
     'Office': 0.337
 }
 
-# Map the product categories to their respective gross profit margins
 data['gross_profit_margin'] = data['product_category'].map(profit_margin_mapping)
 
-# Step 2: Calculate Demand Variability (Standard Deviation of Demand)
-# Group by product_id and calculate standard deviation of demand to measure variability
 data['demand_variability'] = data.groupby('product_id')['forecast_qty'].transform('std').fillna(0)
 
-# Step 3: Set Lead Time and Base Service Level
-lead_time = 2  # Lead time in weeks (adjust based on actual lead time)
-base_service_level = 0.95  # Base service level (e.g., 95%)
+lead_time = 2
+base_service_level = 0.95
 
-# Step 4: Dynamic Service Level Based on Product Category
-# Set higher service levels for certain product categories 
 service_level_mapping = {
     'Accessories': 0.95,
     'Apparel': 0.97,
@@ -86,34 +70,35 @@ service_level_mapping = {
     'Office': 0.97
 }
 data['service_level'] = data['product_category'].map(service_level_mapping).fillna(base_service_level)
-
-# Calculate Z-score based on service level for each product
 data['Z_score'] = data['service_level'].apply(lambda x: norm.ppf(x))
 
-# Step 5: Base Safety Stock Calculation
-# Calculate base safety stock using demand variability, lead time, and service level Z-score
 data['base_safety_stock'] = data['Z_score'] * data['demand_variability'] * np.sqrt(lead_time)
 
-# Step 6: Adjust Safety Stock with Profit Margin
-# Scaling factor for profit margin to prioritize high-margin items
 profit_margin_scale = 0.3
 data['adjusted_safety_stock'] = data['base_safety_stock'] * (1 + data['gross_profit_margin'] * profit_margin_scale)
 
-# Step 7: Seasonal Adjustment (Optional)
-# Assume seasonal factors for certain months (e.g., holiday season in December)
 data['month'] = data['year_month'].dt.month
-seasonal_multiplier = 1.2  # 20% additional buffer during peak months (e.g., December)
-data['seasonal_adjustment'] = np.where(data['month'] == 12, seasonal_multiplier, 1.0)
+seasonal_multipliers = {
+    1: 1.1,  # January - New Year sales
+    2: 1.05,  # February - Slight bump for Valentine's Day
+    3: 1.0,  # March - Lower demand
+    4: 1.0,  # April - Steady demand
+    5: 1.05,  # May - Increase for Mother's Day
+    6: 1.0,  # June - Steady demand
+    7: 1.15,  # July - Mid-year/back-to-school sales start in some regions
+    8: 1.1,  # August - Back-to-school peaks
+    9: 1.0,  # September - Steady demand
+    10: 1.2,  # October - Halloween preparation
+    11: 1.25,  # November - Black Friday/Cyber Monday
+    12: 1.3   # December - Holiday/Christmas season
+}
+
+data['seasonal_adjustment'] = data['month'].map(seasonal_multipliers).fillna(1.0)
 data['final_safety_stock'] = data['adjusted_safety_stock'] * data['seasonal_adjustment']
 
-# Step 8: Calculate Reorder Amount
-# Add safety stock to forecasted demand to determine reorder amount
-data['reorder_amount'] = np.maximum(0, data['forecast_qty'] + data['final_safety_stock'] - data['forecast_qty'])
-
-# Step 9: Final Adjustments for High-Variability Items
-# For items with high demand variability, add an additional buffer
-high_variability_threshold = 10  # Threshold for high variability
-variability_multiplier = 1.1  # Extra 10% buffer for high-variability items
+data['reorder_amount'] = data['forecast_qty'] + data['final_safety_stock']
+high_variability_threshold = 10
+variability_multiplier = 1.1
 data['final_reorder_amount'] = np.where(
     data['demand_variability'] > high_variability_threshold,
     data['reorder_amount'] * variability_multiplier,
@@ -121,18 +106,29 @@ data['final_reorder_amount'] = np.where(
 )
 data['final_reorder_amount'] = np.ceil(data['final_reorder_amount'])
 
-
-# Group by month and product to calculate monthly reorder amounts if needed
 monthly_reorder = data.groupby([data['year_month'].dt.to_period('M'), 'product_id'])['final_reorder_amount'].sum().reset_index()
 monthly_reorder['year_month'] = monthly_reorder['year_month'].dt.to_timestamp()
 
+print(monthly_reorder.head)
 
-# Display results
-print(monthly_reorder.head())
+sample_product_id = 'GGOEA0CH077599' # Replace with product id for viewing
 
+sample_reorder_train = monthly_reorder[monthly_reorder['product_id'] == sample_product_id]
 
-test_data = pd.read_csv('test_predictions.csv')
-test_data['year_month'] = pd.to_datetime(test_data['year_month'], format='%Y-%m-%d')
+plt.figure(figsize=(12, 6))
+plt.plot(sample_reorder_train['year_month'], sample_reorder_train['final_reorder_amount'], marker='o', color='b', label='Reorder Amount')
+plt.title(f'Reorder Amount Over Time for Product ID: {sample_product_id}')
+plt.xlabel('Month')
+plt.ylabel('Reorder Amount')
+plt.xticks(rotation=45)
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+
+plt.show()
+
+test_data = pd.read_csv('forecast_predictions.csv')
+test_data['year_month'] = pd.to_datetime(test_data['year_month'], format='%m/%d/%Y')
 
 test_data['service_level'] = test_data['product_category'].map(service_level_mapping)
 test_data['gross_profit_margin'] = test_data['product_category'].map(profit_margin_mapping)
