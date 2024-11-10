@@ -124,26 +124,26 @@ plt.tight_layout()
 
 plt.show()
 
+
 test_data = pd.read_csv('forecast_predictions.csv')
-test_data['year_month'] = pd.to_datetime(test_data['year_month'], format='%m/%d/%Y')
+
+test_data['year_month'] = pd.to_datetime('2017-08-01')
 
 test_data['service_level'] = test_data['product_category'].map(service_level_mapping)
 test_data['gross_profit_margin'] = test_data['product_category'].map(profit_margin_mapping)
-test_data['demand_variability'] = test_data.groupby('product_id')['forecast_qty'].transform('std').fillna(0)
+
+historical_demand_variability = data.groupby('product_id')['forecast_qty'].std()
+test_data['demand_variability'] = test_data['product_id'].map(historical_demand_variability).fillna(0)
+
+august_multiplier = seasonal_multipliers.get(8, 1.0)
+test_data['seasonal_adjustment'] = august_multiplier
 
 test_data['Z_score'] = test_data['service_level'].apply(lambda x: norm.ppf(x))
 test_data['base_safety_stock'] = test_data['Z_score'] * test_data['demand_variability'] * np.sqrt(lead_time)
-
 test_data['adjusted_safety_stock'] = test_data['base_safety_stock'] * (1 + test_data['gross_profit_margin'] * profit_margin_scale)
-
-test_data['month'] = test_data['year_month'].dt.month
-test_data['seasonal_adjustment'] = test_data['month'].map(seasonal_multipliers).fillna(1.0)
 test_data['final_safety_stock'] = test_data['adjusted_safety_stock'] * test_data['seasonal_adjustment']
-
 test_data['reorder_amount'] = test_data['forecast_qty'] + test_data['final_safety_stock']
 
-high_variability_threshold = 10
-variability_multiplier = 1.1
 test_data['final_reorder_amount'] = np.where(
     test_data['demand_variability'] > high_variability_threshold,
     test_data['reorder_amount'] * variability_multiplier,
@@ -151,8 +151,7 @@ test_data['final_reorder_amount'] = np.where(
 )
 test_data['final_reorder_amount'] = np.ceil(test_data['final_reorder_amount'])
 
-monthly_reorder_test = test_data.groupby([test_data['year_month'].dt.to_period('M'), 'product_id'])['final_reorder_amount'].sum().reset_index()
-monthly_reorder_test['year_month'] = monthly_reorder_test['year_month'].dt.to_timestamp()
+monthly_reorder_test = test_data.groupby(['year_month', 'product_id'])['final_reorder_amount'].sum().reset_index()
 
-print("\nNext Month's Reorder Plan (Test Data):")
-print(monthly_reorder_test)
+print("\nNext Month's Reorder Plan (Test Data - August 2017):")
+print(monthly_reorder_test.head())
