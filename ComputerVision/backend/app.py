@@ -43,7 +43,7 @@ def find_similar_features(query_features, n: int, threshold: float) -> int:
     """
     Find the most similar image based on features extracted from ResNet50 model and returns the product_id of the most similar image
     """
-    
+
     conn = sqlite3.connect('feature_database.db')
     cursor = conn.cursor()
 
@@ -60,6 +60,7 @@ def find_similar_features(query_features, n: int, threshold: float) -> int:
     conn.close()
     products = []
     result = []
+    print("similar_items: " + str(similar_items[0]))
     if similar_items:
         while len(products) < n+1:
             curr_img = similar_items.pop(0)
@@ -206,7 +207,8 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs = find_similar_features(img_features, 4, 0.3)
+    similar_imgs = find_similar_features(img_features, 4, 1)
+    print("similar images:" + str(similar_imgs))
     if similar_imgs:
         response_img = get_image(similar_imgs)
         response_sell = cross_sell_and_up_sell(similar_imgs[0])
@@ -221,7 +223,7 @@ def categorization():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs_id = find_similar_features(img_features, 100, 0.3)
+    similar_imgs_id = find_similar_features(img_features, 100, 1)
     if similar_imgs_id:
         categories = {}
         result = []
