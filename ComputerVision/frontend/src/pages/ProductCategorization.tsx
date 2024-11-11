@@ -34,6 +34,7 @@ const ProductCategorization: React.FC = () => {
       console.log(response);
     } catch (error) {
       console.error("Error processing image:", error);
+      setCategory("fail");
     }
   };
 
@@ -69,7 +70,12 @@ const ProductCategorization: React.FC = () => {
             </button>
           </div>
         </div>
-        {category && ( // Display the processed category
+        {category == "fail" ? (
+          <span className={styles.processedCategory}>
+            Unable to find any similar images in the database.
+          </span>
+        ) : (
+          // Display the processed category
           <span className={styles.processedCategory}>{category}</span>
         )}
       </div>

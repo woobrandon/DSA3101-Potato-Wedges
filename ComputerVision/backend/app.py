@@ -207,7 +207,7 @@ def processImage():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs = find_similar_features(img_features, 4, 1)
+    similar_imgs = find_similar_features(img_features, 4, 0.3)
     print("similar images:" + str(similar_imgs))
     if similar_imgs:
         response_img = get_image(similar_imgs)
@@ -223,7 +223,7 @@ def categorization():
     if not image_data:
         return jsonify({"error: ", "No image found"}), 400
     img_features = extract_features(image_data)
-    similar_imgs_id = find_similar_features(img_features, 100, 1)
+    similar_imgs_id = find_similar_features(img_features, 100, 0.3)
     if similar_imgs_id:
         categories = {}
         result = []
@@ -239,6 +239,8 @@ def categorization():
                 i += 1
         result.sort(key=lambda x: x[1], reverse=True)
         return result[0][0]
+    else:
+        return jsonify({"error": "No similar images found"}), 404
 
 
 if __name__ == "__main__":

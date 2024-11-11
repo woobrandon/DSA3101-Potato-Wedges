@@ -73,6 +73,7 @@ const ProductFinder: React.FC = () => {
       setNoImage(false);
     } catch (error) {
       setNoImage(true);
+      setProcessedImages([]);
       console.error("Error processing image:", error);
     }
     setIsLoading(false);
@@ -111,73 +112,58 @@ const ProductFinder: React.FC = () => {
           </div>
         </div>
       </div>
-      {!isLoading && noImage && processedImages &&( // if there is no similar image to be found
-        <div className={styles.processedImageContainer}>
-          <div className={styles.processedImageWrapper}>
-            <p>No similar image was found! Please upload another image.</p>
-          </div>
-        </div>
-      )
-      }
-      {processedImages &&( // Display the processed image
-        <div className={styles.processedImageContainer}>
-          <div className={styles.processedImageWrapper}>
-            <img
-              src={`data:image/png;base64,${processedImages[0].image}`}
-              alt="Processed"
-              className={styles.processedImage}
-            />
-            <div className={styles.description}>
-              <a href={productUrl} target="_blank">
-                Product Link
-              </a>
-              <p>
-                <strong>Product Name:</strong> {name}
-              </p>
-              <p>
-                <strong>About:</strong> {productAbout}
-              </p>
-              <p>
-                <strong>Price:</strong> {productPrice}
-              </p>
+      {!isLoading &&
+        noImage &&
+        processedImages && ( // if there is no similar image to be found
+          <div className={styles.processedImageContainer}>
+            <div className={styles.processedImageWrapper}>
+              No similar image was found! Please upload another image.
             </div>
           </div>
-          <div className={styles.possibleProcessedImageContainer}>
-            <p>Other similar products (by image)</p>
-            <div className={styles.possibleProcessedImageWrapper}>
-              {processedImages.slice(1, 5).map((data, id) => (
-                <ProductCard
-                  key={id}
-                  imgSrc={`data:image/png;base64,${data.image}`}
-                  name={data.name}
-                  description={data.product_desc}
-                  link={data.product_url}
-                />
-              ))}
+        )}
+      {!isLoading &&
+        !noImage &&
+        processedImages && ( // Display the processed image
+          <div className={styles.processedImageContainer}>
+            <div className={styles.processedImageWrapper}>
+              <img
+                src={`data:image/png;base64,${processedImages[0].image}`}
+                alt="Processed"
+                className={styles.processedImage}
+              />
+              <div className={styles.description}>
+                <a href={productUrl} target="_blank">
+                  Product Link
+                </a>
+                <p>
+                  <strong>Product Name:</strong> {name}
+                </p>
+                <p>
+                  <strong>About:</strong> {productAbout}
+                </p>
+                <p>
+                  <strong>Price:</strong> {productPrice}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className={styles.possibleProcessedImageContainer}>
-            <p>Other similar products (by description, cross sell)</p>
-            <div className={styles.possibleProcessedImageWrapper}>
-              {crossSell.slice(1, 5).map((data, id) => (
-                <ProductCardLong
-                  key={id}
-                  imgSrc={`data:image/png;base64,${data.image}`}
-                  name={data.name}
-                  price={`₹${data.product_price}`}
-                  description={data.product_desc}
-                  link={data.product_url}
-                  about={data.about}
-                  category={data.category}
-                />
-              ))}
-            </div>
-          </div>
-          <div className={styles.possibleProcessedImageContainer}>
-            <p>Other similar products (by description, up sell)</p>
-            {upSell ? (
+            <div className={styles.possibleProcessedImageContainer}>
+              <p>Other similar products (by image)</p>
               <div className={styles.possibleProcessedImageWrapper}>
-                {upSell.slice(1, 5).map((data, id) => (
+                {processedImages.slice(1, 5).map((data, id) => (
+                  <ProductCard
+                    key={id}
+                    imgSrc={`data:image/png;base64,${data.image}`}
+                    name={data.name}
+                    description={data.product_desc}
+                    link={data.product_url}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className={styles.possibleProcessedImageContainer}>
+              <p>Other similar products (by description, cross sell)</p>
+              <div className={styles.possibleProcessedImageWrapper}>
+                {crossSell.slice(1, 5).map((data, id) => (
                   <ProductCardLong
                     key={id}
                     imgSrc={`data:image/png;base64,${data.image}`}
@@ -190,14 +176,33 @@ const ProductFinder: React.FC = () => {
                   />
                 ))}
               </div>
-            ) : (
-              <div>
-                Product is already expensive and there is nothing to up sell ;c
-              </div>
-            )}
+            </div>
+            <div className={styles.possibleProcessedImageContainer}>
+              <p>Other similar products (by description, up sell)</p>
+              {upSell ? (
+                <div className={styles.possibleProcessedImageWrapper}>
+                  {upSell.slice(1, 5).map((data, id) => (
+                    <ProductCardLong
+                      key={id}
+                      imgSrc={`data:image/png;base64,${data.image}`}
+                      name={data.name}
+                      price={`₹${data.product_price}`}
+                      description={data.product_desc}
+                      link={data.product_url}
+                      about={data.about}
+                      category={data.category}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div>
+                  Product is already expensive and there is nothing to up sell
+                  ;c
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };
