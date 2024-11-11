@@ -1,0 +1,13 @@
+google-cloud-bigquery
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+scipy
+xgboost
+xgboost-distribution
+flask
+python-dateutil
+joblib
+pickle5
