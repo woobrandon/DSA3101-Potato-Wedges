@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Page</title>
+    <style>
+        .dataframe {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .dataframe th, .dataframe td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .dataframe th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('products') }}">Data</a>
+</div>
+
+<div class="content">
+    <h1>Data Page</h1>
+    <!-- Display the DataFrame HTML here -->
+    {{ df_html | safe }}
+</div>
+
+</body>
+</html>

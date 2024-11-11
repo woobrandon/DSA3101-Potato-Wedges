@@ -16,6 +16,8 @@ historical_data['year_month'] = pd.to_datetime(historical_data['year_month'])
 forecast_data['year_month'] = pd.to_datetime(forecast_data['year_month'])
 past_forecast_data['year_month'] = pd.to_datetime(past_forecast_data['year_month'])
 
+name_id_mapping = forecast_data[['product_name', 'product_id', 'product_price']].unique()
+
 def lower_ci(mu):
     if mu > 30:
         lower_band = mu - (1.96 * np.sqrt(mu))
@@ -93,6 +95,13 @@ def index():
             result = f"No data found for product ID {id} at price ${price}."
 
     return render_template("index.html", result=result, image_path=image_path)
+
+@app.route('/products')
+def about():
+    result_products = name_id_mapping.sort_values('product_name')
+    name_id_mapping_html = name_id_mapping.to_html(classes='dataframe', index=False)
+    
+    return render_template('data.html', df_html=name_id_mapping_html)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False, port=5001)

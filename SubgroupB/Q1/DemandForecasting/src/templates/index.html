@@ -8,6 +8,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+         /* Simple styling for sidebar */
+         .sidebar {
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            color: #fff;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            padding: 10px;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             display: flex;
@@ -77,6 +98,11 @@
                 <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Forecast Image">
             {% endif %}
         </div>
+    </div>
+
+    <div class="sidebar">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('products') }}">Products</a>
     </div>
 </body>
 </html>
