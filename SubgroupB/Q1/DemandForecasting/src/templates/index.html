@@ -8,25 +8,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-         /* Simple styling for sidebar */
          .sidebar {
-            height: 100vh;
-            width: 200px;
+            height: 100%;
+            width: 0;
             position: fixed;
             top: 0;
             left: 0;
             background-color: #333;
-            color: #fff;
-            padding-top: 20px;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            color: white;
+            font-family: 'Lato', sans-serif;
         }
+        
+        
         .sidebar a {
-            display: block;
-            color: #fff;
-            padding: 10px;
+            padding: 10px 15px;
             text-decoration: none;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            font-family: 'Lato', sans-serif;
         }
-        .sidebar a:hover {
-            background-color: #575757;
+        
+       
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            font-size: 25px;
+            margin-left: 50px;
+        }
+        
+        
+        #openSidebarBtn {
+            position: fixed;      
+            top: 10px;           
+            left: 10px;          
+            font-size: 15px;     
+            cursor: pointer;     
+            color: #333;      
+            background-color: #f0f0f0; 
+            padding: 10px 15px;   
+            border-radius: 5px;   
+            border: none;         
+            z-index: 1;  
         }
 
         body {
@@ -37,28 +64,20 @@
             justify-content: flex-start;
         }
 
-        /* Container for left and right sections */
+        
         .container {
             display: flex;
-            justify-content: space-between; /* Space out the left and right */
-            width: 100%; /* Full width */
-            max-width: 1200px; /* Max width for larger screens */
+            justify-content: space-between;
+            width: 100%; 
+            max-width: 1200px; 
         }
 
-        /* Left section - header and form */
         .left {
-            width: 45%; /* You can adjust this as needed */
+            width: 45%; 
             margin-top: 200px
         }
 
-        /* Right section - prediction result and image */
-        .right {
-            width: 45%; /* You can adjust this as needed */
-            padding-left: 10px; /* Add some space between sections */
-            margin-top: 150px;
-        }
-
-        h1, h2 {
+        h1 {
             font-family: 'Lato', sans-serif;
         }
 
@@ -66,43 +85,42 @@
             margin-top: 20px;
         }
 
-        form {
-            margin-top: 20px;
-        }
-
-        img {
-            width: 100%; /* Make image responsive */
-            max-width: 1000px; /* Optional: set max width for image */
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Left section -->
+        
         <div class="left">
-            <h1>Find the forecasted demand for your product of choice</h1>
-            <form method="post" action="/">
-                <label for="input_text">Please input using the format (ID, Price):</label>
-                <input type="text" id="input_text" name="input_text" required>
-                <button type="submit">Submit</button>
-            </form>
+            <h1>Welcome!</h1>
+            <p>Please use the sidebar to navigate to different functions</p>
         </div>
 
-        <!-- Right section -->
-        <div class="right">
-            {% if result %}
-                <h2>Prediction for next month:</h2>
-                <p>{{ result }}</p>
-            {% endif %}
-            {% if image_path %}
-                <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Forecast Image">
-            {% endif %}
-        </div>
     </div>
 
-    <div class="sidebar">
+    <div id="openSidebarBtn" onclick="openSidebar()">☰ Menu</div>
+
+   
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
         <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('demand_forecasting') }}">Demand Forecasting</a>
+        <a href="{{ url_for('product_recommendation') }}">Product Recommendation</a>
         <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('users') }}">Users</a>
     </div>
+
+    <script>
+        function openSidebar() {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("mainContent").style.marginLeft = "250px";
+        }
+    
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("mainContent").style.marginLeft = "0";
+        }
+    </script>
+    
+
 </body>
 </html>

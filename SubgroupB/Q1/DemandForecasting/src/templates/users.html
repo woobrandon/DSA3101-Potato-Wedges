@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Users</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        .content {
+            padding-top: 50px;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            color: white;
+            font-family: 'Lato', sans-serif;
+        }
+        
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+        
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            font-size: 25px;
+            margin-left: 50px;
+        }
+        
+        #openSidebarBtn {
+            position: fixed;   
+            top: 10px;           
+            left: 10px;          
+            font-size: 15px;   
+            cursor: pointer;     
+            color: #333;     
+            background-color: #f0f0f0; 
+            padding: 10px 15px;   
+            border-radius: 5px;  
+            border: none;       
+            z-index: 1;  
+            font-family: 'Lato', sans-serif;
+        }
+        .dataframe {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Lato', sans-serif;
+        
+        }
+        .dataframe th, .dataframe td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .dataframe th {
+            background-color: #f2f2f2;
+        }
+        h1, h2 {
+            font-family: 'Lato', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<div id="openSidebarBtn" onclick="openSidebar()">☰ Menu</div>
+
+<div class="sidebar">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('products') }}">Products</a>
+</div>
+
+<div class="content">
+    <h1>Data Page</h1>
+    {{ df_html | safe }}
+</div>
+
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('demand_forecasting') }}">Demand Forecasting</a>
+    <a href="{{ url_for('product_recommendation') }}">Product Recommendation</a>
+    <a href="{{ url_for('products') }}">Products</a>
+    <a href="{{ url_for('users') }}">Users</a>
+</div>
+
+<script>
+    function openSidebar() {
+        document.getElementById("mySidebar").style.width = "250px";
+        document.getElementById("mainContent").style.marginLeft = "250px";
+    }
+
+    function closeSidebar() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.getElementById("mainContent").style.marginLeft = "0";
+    }
+</script>
+
+</body>
+</html>
