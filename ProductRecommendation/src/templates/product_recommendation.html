@@ -118,8 +118,8 @@
         <!-- Right section -->
         <div class="right">
             {% if result %}
-                <h2>Recommended products:</h2>
-                <div>{{ result | safe }}</div>
+                <h2>Recommended products for user {{ result.name }}:</h2>
+                <div>{{ result.products | safe }}</div>
             {% endif %}
             
         </div>

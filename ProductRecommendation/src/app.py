@@ -108,12 +108,14 @@ def product_recommendation():
             else:
                 upsell_products_names = upsell_products
 
-            result = f"""
+            result = {'name': id,
+                      'products': f"""
                 <p><strong>Products to cross-sell:</strong><br>
                 { '<br>'.join(crosssell_products_names) if crosssell_products_names else 'No products found'}</p>
                 <p><strong>Products to upsell:</strong><br>
                 { '<br>'.join(upsell_products_names) if upsell_products_names else 'No products found'}</p>
-            """
+             """
+            }
             
         except IndexError:
             result = f"No data found for user ID {id}."
