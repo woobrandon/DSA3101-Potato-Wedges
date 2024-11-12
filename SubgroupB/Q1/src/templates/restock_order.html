@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Reorder</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+         .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            color: white;
+            font-family: 'Lato', sans-serif;
+        }
+       
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            font-family: 'Lato', sans-serif;
+        }
+        
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            font-size: 25px;
+            margin-left: 50px;
+        }
+        
+        #openSidebarBtn {
+            position: fixed;     
+            top: 10px;          
+            left: 10px;         
+            font-size: 15px;      
+            cursor: pointer;   
+            color: #333;      
+            background-color: #f0f0f0; 
+            padding: 10px 15px;  
+            border-radius: 5px;  
+            border: none;        
+            z-index: 1;  
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between; 
+            width: 100%; 
+            max-width: 1200px; 
+        }
+
+      
+        .left {
+            width: 45%; 
+            margin-top: 200px
+        }
+
+        
+        .right {
+            width: 45%;
+            padding-left: 10px;
+            margin-top: 100px;
+        }
+
+        h1, h2 {
+            font-family: 'Lato', sans-serif;
+        }
+
+        p {
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        img {
+            width: 100%;
+            max-width: 1500px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <h1>Find the restock amount for your product of choice</h1>
+            <form method="post" action="/restock_order">
+                <label for="input_text">Please input the product ID:</label>
+                <input type="text" id="input_text" name="input_text" required>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+      
+        <div class="right">
+            {% if result %}
+                <h2>Action for next month:</h2>
+                <p>{{ result }}</p>
+            {% endif %}
+            {% if image_path %}
+                <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Forecast Image">
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="openSidebarBtn" onclick="openSidebar()">☰ Menu</div>
+
+    
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('demand_forecasting') }}">Demand forecasting</a>
+        <a href="{{ url_for('restock_order') }}">Restock order instructions</a>
+        <a href="{{ url_for('products') }}">List of products</a>
+    </div>
+
+    <script>
+        function openSidebar() {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("mainContent").style.marginLeft = "250px";
+        }
+    
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("mainContent").style.marginLeft = "0";
+        }
+    </script>
+    
+
+</body>
+</html>
