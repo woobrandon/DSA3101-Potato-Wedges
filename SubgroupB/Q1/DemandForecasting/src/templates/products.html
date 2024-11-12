@@ -82,17 +82,15 @@
 </div>
 
 <div class="content">
-    <h1>Data Page</h1>
+    <h1>List of Products</h1>
     {{ df_html | safe }}
 </div>
 
 <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
     <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('demand_forecasting') }}">Demand Forecasting</a>
-    <a href="{{ url_for('product_recommendation') }}">Product Recommendation</a>
-    <a href="{{ url_for('products') }}">Products</a>
-    <a href="{{ url_for('users') }}">Users</a>
+    <a href="{{ url_for('demand_forecasting') }}">Demand forecasting</a>
+    <a href="{{ url_for('products') }}">List of products</a>
 </div>
 
 <script>
