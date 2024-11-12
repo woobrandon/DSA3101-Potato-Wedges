@@ -36,28 +36,16 @@
  ┃   ┗ Analyze the impact of various promotional campaigns on sales.
  ┃
  ┗ 📂SubgroupB
-   ┣ 📜How can we optimize inventory levels to minimize costs while ensuring product availability?
-   ┃ ┣ Develop a demand forecasting model using historical sales data.
-   ┃ ┗ Create an inventory optimization algorithm to balance stock levels and costs.
-   ┣ 📜What pricing strategies can we implement to maximize revenue?
-   ┃ ┣ Analyze price elasticity for different product categories.
-   ┃ ┗ Develop a dynamic pricing model based on demand and competition.
-   ┗ 📜How can we improve the efficiency of our supply chain?
-     ┣ Analyze supplier performance and identify bottlenecks.
-     ┗ Optimize order fulfillment processes to reduce delivery times.
-```
-
-
-```
-Subgroup B
-To explore the work done by Subgroup B, navigate to the SubgroupB/ folder in the main repository. Within this folder, you will find additional subfolders organized by specific research questions:
-
-Q1/: Contains our approach and analysis for "How can we optimize inventory levels to minimize costs while ensuring product availability?". Explore this folder to see the methodologies, data, and results related to inventory optimization.
-
-Q2/: Includes details on our investigation into "What pricing strategies can we implement to maximize revenue?". In this folder, you'll find our pricing strategy models, data analysis, and recommendations for revenue maximization.
-
-Q3/: This folder addresses "How can we improve the efficiency of our supply chain?". Here, we’ve documented our strategies, analysis, and proposals for enhancing supply chain efficiency.
-
-To navigate to any question-specific folder, click on SubgroupB/ and select Q1/, Q2/, or Q3/ as needed.
-
+   ┣ 📂Q1
+   ┃ ┗ 📜How can we optimize inventory levels to minimize costs while ensuring product availability?
+   ┃   ┣ Develop a demand forecasting model using historical sales data.
+   ┃   ┗ Create an inventory optimization algorithm to balance stock levels and costs.
+   ┣ 📂Q2
+   ┃ ┗ 📜What pricing strategies can we implement to maximize revenue?ensuring product availability?
+   ┃   ┣ Analyze price elasticity for different product categories.
+   ┃   ┗ Develop a dynamic pricing model based on demand and competition.
+   ┗ 📂Q3
+     ┗ 📜How can we improve the efficiency of our supply chain?ensuring product availability?
+       ┣ Analyze supplier performance and identify bottlenecks.
+       ┗ Optimize order fulfillment processes to reduce delivery times.
 ```
