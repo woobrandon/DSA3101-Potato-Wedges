@@ -1,6 +1,8 @@
 from flask import Flask, render_template, url_for, request
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -11,6 +13,8 @@ from scipy.stats import poisson
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter
 warnings.filterwarnings("ignore")
+
+# plt.switch_backend('Agg')
 
 
 ### Demand Forecasting
@@ -46,9 +50,7 @@ past_forecast_data['ci_upper'] = past_forecast_data['forecast_qty'].apply(lambda
 
 all_months = ['Jul 2016', 'Aug 2016', 'Sep 2016', 'Oct 2016', 'Nov 2016', 'Dec 2016', 'Jan 2017', 'Feb 2017', 'Mar 2017', 'Apr 2017', 'May 2017', 'Jun 2017', 'Jul 2017']
 
-def plot_graph(id, price):
-
-    plt.switch_backend('Agg')
+def plot_demand_forecast(id, price):
 
     past_true = historical_data.loc[(historical_data['product_id'] == id) & (historical_data['product_price'] == price) & (historical_data['year_month'] != '2016-07-01')]
     forecast = forecast_data.loc[(forecast_data['product_id'] == id) & (forecast_data['product_price'] == price)]
@@ -59,23 +61,52 @@ def plot_graph(id, price):
     past_forecast.rename({"forecast_qty":'qty'}, axis = 1, inplace = True)
     forecasts_df = pd.concat([past_forecast, forecast])
 
-    plt.figure(figsize=(18, 13))
+    plt.figure(figsize=(18, 12))
     sns.set_context("poster")
-    sns.lineplot(x = past_true['year_month'], y = past_true['qty'], color = 'blue',label = 'Actual', errorbar = None)
-    sns.lineplot(x = forecasts_df['year_month'], y = forecasts_df['qty'], color = 'green', label = 'Prediction', errorbar = None) 
+    sns.lineplot(x = past_true['year_month'], y = past_true['qty'], color = 'blue',label = 'Actual', marker = 'o', errorbar = None)
+    sns.lineplot(x = forecasts_df['year_month'], y = forecasts_df['qty'], color = 'red', marker = 's', label = 'Prediction', errorbar = None) 
     y_lower = forecasts_df['ci_lower']
     y_upper = forecasts_df['ci_upper']
-    plt.fill_between(forecasts_df['year_month'], y_lower, y_upper, color = "green", alpha = 0.1 )
+    plt.fill_between(forecasts_df['year_month'], y_lower, y_upper, color = "red", alpha = 0.1 )
     plt.xticks(rotation=45, ticks = forecasts_df['year_month'][::1], labels = forecasts_df['year_month'].dt.strftime('%b %Y'))
     plt.xlabel('Month')
-    plt.ylabel('Sales quantity', labelpad = 20)
-    plt.title(f'Sales trend and forecast for {name[0]}', pad = 25)
+    plt.ylabel('Demand quantity', labelpad = 20)
+    plt.title(f'Demand trend and forecast for product ID {id} at ${price}', pad = 25)
+    plt.grid()
+    plt.tight_layout()
     
-    image_path = f"static/images/test.png"
+    image_path = f"static/images/demand_forecast.png"
     plt.savefig(image_path, dpi = 300)
     plt.close()
 
-    return f'images/test.png'
+    return f'images/demand_forecast.png'
+
+### Inventory Optimisation
+monthly_reorder = pd.read_csv("../data/monthly_reorder.csv")
+monthly_reorder['year_month'] = pd.to_datetime(monthly_reorder['year_month'])
+monthly_reorder_test = pd.read_csv("../data/monthly_reorder_test.csv")
+
+def plot_reorder(id):
+    sample_reorder_train = monthly_reorder[monthly_reorder['product_id'] == id]
+
+    plt.figure(figsize=(18, 12))
+    plt.plot(sample_reorder_train['year_month'], sample_reorder_train['final_reorder_amount'], marker='o', color='b', label='Reorder Amount')
+    plt.title(f'Past Reorder Amounts for Product ID: {id}', fontsize = 24, pad = 25)
+    plt.xlabel('Month', fontsize = 18, labelpad = 25)
+    plt.ylabel('Reorder Amount', fontsize = 18, labelpad = 20)
+    plt.xticks(rotation=45, fontsize = 14, 
+               ticks = sample_reorder_train['year_month'][::1], labels = sample_reorder_train['year_month'].dt.strftime('%b %Y'))
+    plt.yticks(fontsize = 14)
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    # Save plot as image
+    image_path = f"static/images/stock_reorder.png"
+    plt.savefig(image_path, dpi = 300)
+    plt.close()
+
+    return f'images/stock_reorder.png'
 
 
 app = Flask(__name__)
@@ -97,12 +128,28 @@ def demand_forecasting():
             price = float(input_text.split(",")[1].strip())
         
             forecast_qty = forecast_data.loc[(forecast_data['product_id'] == id) & (forecast_data['product_price'] == price), 'forecast_qty'].values[0].astype(int)
-            image_path = plot_graph(id, price)
+            image_path = plot_demand_forecast(id, price)
             result = f"Forecasted demand for product {id} at price ${price} is {forecast_qty} unit(s)."
         except IndexError:
             result = f"No data found for product ID {id} at price ${price}."
 
     return render_template("demand_forecasting.html", result=result, image_path=image_path)
+
+@app.route('/restock_order', methods=["GET", "POST"])
+def restock_order():
+    result = None
+    image_path = None
+
+    if request.method == "POST":
+        input_text = request.form["input_text"] 
+        try:
+            restock_qty = monthly_reorder_test.loc[monthly_reorder_test['product_id'] == input_text, 'final_reorder_amount'].values[0].astype(int)
+            result = f"Restock {restock_qty} units of product {input_text}"
+            image_path = plot_reorder(input_text)
+        except IndexError:
+            result = f"No data found for product ID {input_text}."
+
+    return render_template("restock_order.html", result=result, image_path=image_path)
 
 @app.route('/products')
 def products():

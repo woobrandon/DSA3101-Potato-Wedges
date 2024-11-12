@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demand Forecasting</title>
+    <title>Stock Reorder</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
@@ -21,8 +21,7 @@
             color: white;
             font-family: 'Lato', sans-serif;
         }
-        
-        
+       
         .sidebar a {
             padding: 10px 15px;
             text-decoration: none;
@@ -32,7 +31,6 @@
             font-family: 'Lato', sans-serif;
         }
         
-       
         .sidebar .closebtn {
             position: absolute;
             top: 0;
@@ -41,18 +39,17 @@
             margin-left: 50px;
         }
         
-        
         #openSidebarBtn {
-            position: fixed;      
-            top: 10px;           
-            left: 10px;          
-            font-size: 15px;     
-            cursor: pointer;     
+            position: fixed;     
+            top: 10px;          
+            left: 10px;         
+            font-size: 15px;      
+            cursor: pointer;   
             color: #333;      
             background-color: #f0f0f0; 
-            padding: 10px 15px;   
-            border-radius: 5px;   
-            border: none;         
+            padding: 10px 15px;  
+            border-radius: 5px;  
+            border: none;        
             z-index: 1;  
         }
 
@@ -64,20 +61,27 @@
             justify-content: flex-start;
         }
 
-        
         .container {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; 
             width: 100%; 
             max-width: 1200px; 
         }
 
+      
         .left {
             width: 45%; 
             margin-top: 200px
         }
 
-        h1 {
+        
+        .right {
+            width: 45%;
+            padding-left: 10px;
+            margin-top: 100px;
+        }
+
+        h1, h2 {
             font-family: 'Lato', sans-serif;
         }
 
@@ -85,21 +89,42 @@
             margin-top: 20px;
         }
 
+        form {
+            margin-top: 20px;
+        }
+
+        img {
+            width: 100%;
+            max-width: 1500px; 
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        
         <div class="left">
-            <h1>Welcome!</h1>
-            <p>Please use the sidebar to navigate to different functions</p>
+            <h1>Find the restock amount for your product of choice</h1>
+            <form method="post" action="/restock_order">
+                <label for="input_text">Please input the product ID:</label>
+                <input type="text" id="input_text" name="input_text" required>
+                <button type="submit">Submit</button>
+            </form>
         </div>
 
+      
+        <div class="right">
+            {% if result %}
+                <h2>Action for next month:</h2>
+                <p>{{ result }}</p>
+            {% endif %}
+            {% if image_path %}
+                <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Forecast Image">
+            {% endif %}
+        </div>
     </div>
 
     <div id="openSidebarBtn" onclick="openSidebar()">☰ Menu</div>
 
-   
+    
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
         <a href="{{ url_for('index') }}">Home</a>
