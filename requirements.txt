@@ -11,3 +11,4 @@ flask
 python-dateutil
 joblib
 pickle5
+db-dtypes
