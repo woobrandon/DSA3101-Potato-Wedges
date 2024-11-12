@@ -1,5 +1,31 @@
 # E-commerce Performance Analysis and Optimisation
 
+## Overview
+
+The Google Analytics sample dataset provides a comprehensive view of e-commerce performance data, specifically for the Google Merchandise Store, which sells Google-branded products. This dataset is typically used for analysis and experimentation with Google Analytics 360 data, offering insights into website traffic, user behavior, and transaction activities on an e-commerce platform.
+
+The Google Analytics sample dataset is a rich resource for analyzing the performance of an e-commerce website, helping businesses and analysts optimize their marketing strategies, improve user experiences, and increase sales. By working with this dataset, we can explore how different traffic sources, content engagement, and product offerings impact overall store performance.
+
+Since the Google Analytics sample dataset is an example of Google Analytics 360, the insights and analysis techniques derived from this data are directly applicable to any other e-commerce platform using Google Analytics 360. This means that businesses operating on different e-commerce websites can conduct similar analyses, such as understanding customer behavior, measuring sales performance and even managing inventories. With any other type of e-commerce platform, the structure and metrics in the Google Analytics 360 data remain consistent across sites.
+
+## Set-up
+
+1. Install the libraries used in our notebooks
+
+   ```
+   pip install -r requirements.txt
+   ```
+
+2. Using Google BigQuery requires additional set-up found here
+
+   https://cloud.google.com/python/docs/reference/bigquery/latest
+
+3. For LLM/Computer Vision models, navigate to their directories and run
+
+   ```
+   docker compose up
+   ```
+
 ## Project structure
 
 ```
@@ -49,3 +75,11 @@
        ┣ Analyze supplier performance and identify bottlenecks.
        ┗ Optimize order fulfillment processes to reduce delivery times.
 ```
+
+## Data dictionary
+
+1. Google Analytics Sample Dataset
+
+   https://support.google.com/analytics/answer/3437719?hl=en
+
+2. Amazon sales dataset
