@@ -130,8 +130,8 @@ def demand_forecasting():
             forecast_qty = forecast_data.loc[(forecast_data['product_id'] == id) & (forecast_data['product_price'] == price), 'forecast_qty'].values[0].astype(int)
             image_path = plot_demand_forecast(id, price)
             result = f"Forecasted demand for product {id} at price ${price} is {forecast_qty} unit(s)."
-        except IndexError:
-            result = f"No data found for product ID {id} at price ${price}."
+        except IndexError or UnboundLocalError:
+            result = f"Please enter a valid product ID and price."
 
     return render_template("demand_forecasting.html", result=result, image_path=image_path)
 
@@ -146,8 +146,8 @@ def restock_order():
             restock_qty = monthly_reorder_test.loc[monthly_reorder_test['product_id'] == input_text, 'final_reorder_amount'].values[0].astype(int)
             result = f"Restock {restock_qty} units of product {input_text}"
             image_path = plot_reorder(input_text)
-        except IndexError:
-            result = f"No data found for product ID {input_text}."
+        except IndexError or UnboundLocalError:
+            result = f"Please enter a valid product ID."
 
     return render_template("restock_order.html", result=result, image_path=image_path)
 
