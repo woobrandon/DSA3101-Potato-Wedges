@@ -1,0 +1,11 @@
+services:
+  inventory_optimisation_app:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./models:/app/models
+      - ./templates:/app/templates
+      - ./static:/app/static
+    command: >
+      sh -c "python app.py"
