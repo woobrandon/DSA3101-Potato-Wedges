@@ -83,3 +83,22 @@ Since the Google Analytics sample dataset is an example of Google Analytics 360,
    https://support.google.com/analytics/answer/3437719?hl=en
 
 2. Amazon sales dataset
+
+   | **Section**                | **Sub-Section**         | **Attribute**         |
+   | -------------------------- | ----------------------- | --------------------- |
+   | **1. Product Information** | 1.1 Product ID          | `product_id`          |
+   |                            | 1.2 Product Name        | `product_name`        |
+   |                            | 1.3 Product Category    | `category`            |
+   |                            | 1.4 Discounted Price    | `discounted_price`    |
+   |                            | 1.5 Actual Price        | `actual_price`        |
+   |                            | 1.6 Discount Percentage | `discount_percentage` |
+   |                            | 1.7 Product Rating      | `rating`              |
+   |                            | 1.8 Rating Count        | `rating_count`        |
+   |                            | 1.9 Product Description | `about_product`       |
+   | **2. User Reviews**        | 2.1 User ID             | `user_id`             |
+   |                            | 2.2 User Name           | `user_name`           |
+   |                            | 2.3 Review ID           | `review_id`           |
+   |                            | 2.4 Review Title        | `review_title`        |
+   |                            | 2.5 Review Content      | `review_content`      |
+   | **3. Product Media**       | 3.1 Image Link          | `img_link`            |
+   |                            | 3.2 Product Link        | `product_link`        |
