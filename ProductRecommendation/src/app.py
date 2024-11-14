@@ -1,8 +1,9 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import warnings
+import time
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter
 warnings.filterwarnings("ignore")
@@ -28,18 +29,17 @@ def upsell(id, lim = -1):                                    # this function wil
     df = product_df.copy()
     df['similarity'] = cos_sim
     df.drop(['tokens', 'lemma', 'vector'], axis = 1, inplace = True)
-    curr_price = df.loc[df['product_id'] == id, 'product_price'].values[0]                      # obtain price of current product
+    curr_price = df.loc[df['product_id'] == id, 'product_price'].values[0]                     
     df = df.loc[df['product_id'] != id]
 
-    # print(f'Current item is sold for {curr_price}')
     if lim != -1:
         return df.sort_values('similarity', ascending = False).loc[(df['product_id'] != id) & (df['product_price'] > curr_price) & (df['similarity'] > 0.8), 'product_id'].values[:lim]  # only return products that are more expensive
     else:
         return df.sort_values('similarity', ascending = False).loc[(df['product_id'] != id) & (df['product_price'] > curr_price) & (df['similarity'] > 0.8), 'product_id'].values
 
-def crosssell(id, lim = -1):          # This function takes in a product and returns the top n associated products (confidence >35%)
+def crosssell(id, lim = -1):         
     if id not in associated_items['product_1'].values:
-        return 'There are no associated items for this product'     # If there are no associated items, a message will be printed alerting the user
+        return 'There are no associated items for this product' 
     if lim != -1:
         return associated_items.sort_values('similarity', ascending = False).loc[associated_items['product_1'] == id, 'product_2'].values[:lim]
     else:
@@ -73,10 +73,6 @@ def get_product_name(products):
     return all_names
 
 
-
-from flask import Flask, render_template, request
-import pandas as pd
-import time
 
 app = Flask(__name__)
 
@@ -117,8 +113,11 @@ def product_recommendation():
              """
             }
             
-        except IndexError:
-            result = f"No data found for user ID {id}."
+        except (IndexError, UnboundLocalError):
+            result = {
+            'name': None,
+            'products': "Please enter a valid user ID and both cross-sell and upsell quantities."
+        }
 
     return render_template("product_recommendation.html", result=result)
 
