@@ -84,6 +84,8 @@ Since the Google Analytics sample dataset is an example of Google Analytics 360,
 
 2. Amazon Sales Dataset
 
+   https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
+
    | **Section**                | **Sub-Section**         | **Attribute**         |
    | -------------------------- | ----------------------- | --------------------- |
    | **1. Product Information** | 1.1 Product ID          | `product_id`          |
