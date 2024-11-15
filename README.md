@@ -82,7 +82,7 @@ Since the Google Analytics sample dataset is an example of Google Analytics 360,
 
    https://support.google.com/analytics/answer/3437719?hl=en
 
-2. Amazon sales dataset
+2. Amazon Sales Dataset
 
    | **Section**                | **Sub-Section**         | **Attribute**         |
    | -------------------------- | ----------------------- | --------------------- |
@@ -102,3 +102,32 @@ Since the Google Analytics sample dataset is an example of Google Analytics 360,
    |                            | 2.5 Review Content      | `review_content`      |
    | **3. Product Media**       | 3.1 Image Link          | `img_link`            |
    |                            | 3.2 Product Link        | `product_link`        |
+
+3. Orders and Shipment Dataset
+
+   | **Section**                | **Sub-Section**                | **Attribute**                 |
+   | -------------------------- | ------------------------------ | ----------------------------- |
+   | **1. Order Details**       | 1.1 Order ID                   | `Order ID`                    |
+   |                            | 1.2 Order Item ID              | `Order ItemID`                |
+   |                            | 1.3 Order Year and Month       | `Order YearMonth`             |
+   |                            | 1.4 Order Year                 | `Order Year`                  |
+   |                            | 1.5 Order Month                | `Order Month`                 |
+   |                            | 1.6 Order Day                  | `Order Day`                   |
+   |                            | 1.7 Order Time                 | `Order Time`                  |
+   |                            | 1.8 Order Quantity             | `Order Quantity`              |
+   | **2. Product Details**     | 2.1 Product Department         | `Product Department`          |
+   |                            | 2.2 Product Category           | `Product Category`            |
+   |                            | 2.3 Product Name               | `Product Name`                |
+   | **3. Customer Details**    | 3.1 Customer ID                | `Customer ID`                 |
+   |                            | 3.2 Customer Market            | `Customer Market`             |
+   |                            | 3.3 Customer Region            | `Customer Region`             |
+   |                            | 3.4 Customer Country           | `Customer Country`            |
+   | **4. Shipment Details**    | 4.1 Warehouse Country          | `Warehouse Country`           |
+   |                            | 4.2 Shipment Year              | `Shipment Year`               |
+   |                            | 4.3 Shipment Month             | `Shipment Month`              |
+   |                            | 4.4 Shipment Day               | `Shipment Day`                |
+   |                            | 4.5 Shipment Mode              | `Shipment Mode`               |
+   |                            | 4.6 Shipment Days - Scheduled  | ` Shipment Days - Scheduled ` |
+   | **5. Sales Details**      | 5.1 Gross Sales                | `Gross Sales`                 |
+   |                            | 5.2 Percentage of Discount     | `Discount %`                  |
+   |                            | 5.3 Profit                     | `Profit`                      |
