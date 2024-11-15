@@ -105,6 +105,8 @@ Since the Google Analytics sample dataset is an example of Google Analytics 360,
 
 3. Orders and Shipment Dataset
 
+   https://github.com/hoshigan/Supply-Chain-Analytic---Just-In-Time-Company/blob/main/data.zip
+
    | **Section**                | **Sub-Section**                | **Attribute**                 |
    | -------------------------- | ------------------------------ | ----------------------------- |
    | **1. Order Details**       | 1.1 Order ID                   | `Order ID`                    |
